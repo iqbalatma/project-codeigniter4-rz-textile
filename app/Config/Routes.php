@@ -44,12 +44,10 @@ $routes->group('', function ($routes) {
 //DASHBOARD
 $routes->group('', ['filter' => 'auth'], function ($routes) {
 
-
-
     //INVOICE
     $routes->group('invoice', function ($routes) {
         $routes->get('/', 'InvoiceController::show', ["as" => "invoice.show"]);
-        $routes->get('edit/(:any)', 'InvoiceController::edit/$1');
+        $routes->get('edit/(:any)', 'InvoiceController::edit/$1', ["as" => "invoice.refund"]);
         $routes->get('print/(:any)', 'InvoiceController::printInvoice/$1', ["as" => "invoice.print"]);
         $routes->get('report', 'InvoiceController::report', ["as" => "invoice.report", 'filter' => 'isOwner']);
 
