@@ -1,0 +1,13 @@
+        $("#table-roll").on("click", ".btn-profit", function() {
+            const rollId = $(this).data("roll-id");
+            let modal = $("#modal-profit").modal("show");
+            $.ajax({
+                url: `/api/profit/roll/${rollId}`,
+                method: "GET",
+            }).done(function(result) {
+                $("#profit-roll-name").text(result.data[0].roll_name);
+                $("#profit-total-capital").text(intToRupiah(result.data[0].capital));
+                $("#profit-total-profit").text(intToRupiah(result.data[0].profit));
+                $("#profit-total-quantity").text(result.data[0].quantity);
+            });
+        })

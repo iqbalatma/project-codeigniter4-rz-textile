@@ -1,0 +1,60 @@
+                TODO                                                                                                STATUS
+
+
+1. GAGALKAN PENJUALAN KETIKA JUMLAH BARANG AKAN MINUS                                                               -> DONE
+2. REFUND ACTION CONTROLLER                                                                                         -> DONE
+6. ADD CATEGORY JADIKAN AJAX                                                                                        -> DONE
+3. SILENT PRINT                                                                                                         *
+15. Form untuk cetak barcode, pas mau nyetak barcode kasih form mau cetak berapa lembar, kasih opsi max sesuai stock    *
+5. HARGA DI REFUND                                                                                                  -> DONE
+19. SELECT OPTION JADIKAN AJAX JUGA AGAR SELALU UPDATE KETIKA TERJADI PERUBAHAN                                     -> DONE
+17. Laporan data barang dari setiap jenis, misal data barang kain jersey, ada berapa stock jersey ada               -> DONE
+    berapa keuntungan penjualan dari jersey berapa modal yg keluar dari jersey. Juga misal ada jersey motif bunga 
+    ada stock berapa terjual berapa, keuntungan berapa, modal berapa
+4. GENERATED CODE UNTUK BARCODE                                                                                     -> DONE
+7. BERSIHKAN DATA (KARNA SUDAH MENGGUNAKAN BARCODE)                                                                 -> DONE
+8. HAPUS BARANG ROLL                                                                                                -> DONE
+9. YANG MASUK KE PENJUALAN HANYA BARANG YANG QUANTITY DIATAS 0                                                      -> DONE
+10. “Cari Roll Kain, Satuan, Data Roll Kain, Transaksi Roll, Restok Barang” disatuin aja jadi Data Barang.          -> DONE
+12. penjualan harga harus bisa diubah saat transaksi                                                                -> DONE  
+13. Di penjualan Cuma 3 angka awal dari harga jual yang terbawa, misal harga jual 123000, pas transaksi             -> DONE
+    penjualan dan diinvoice hanya 123                                                                               
+11. Ukuran font dll disesuaikan lagi karna dilihatnya terlalu kebesaran dan berantakan                                  #
+14. Untuk log itu untuk semua aktifitas, misal transaksi penjualan juga masuk di log                                    #
+16. Tipe pembayaran (cash/transfer) dan Total pembayaran                                                            -> DONE
+18. TAMPILKAN INVOICE SETELAH TRANSAKI BELANJA BERHASIL
+
+
+
+TODO
+Kuantitas pada refund dan penjualan kalau masih 0 tidak boleh transaksi
+
+
+cek 
+transaksi
+penjualan
+cari roll kain
+roll kain
+restok roll
+refund
+
+
+
+cek data konsumen       DONE
+cek unit
+cek roll
+cek search roll
+cek data transaksi
+cek restok
+cek cek dashboard
+cek INVOICE
+cek Laporan
+cek penjualan
+cek refund
+
+
+
+
+TRANSAKSI PENJUALAN
+HAPUS CHECK APAKAH ROLL SUDAH ada
+TAMBAH ON CLICK CONTENTEDITABLE TRUE AND FOCUS PADA TRANSACTION ALL
