@@ -23,6 +23,18 @@ export default alert = {
       text: message,
     });
   },
+  waitingAlert() {
+    return Swal.fire({
+      title: "Please wait!",
+      timerProgressBar: true,
+      showConfirmButton: false,
+      allowOutsideClick: false,
+      allowEscapeKey: false,
+      didOpen: () => {
+        Swal.showLoading();
+      },
+    });
+  },
 
   cancelDeleting() {
     this.mySwal().fire("Dibatalkan", "Penghapusan data dibatalkan", "error");

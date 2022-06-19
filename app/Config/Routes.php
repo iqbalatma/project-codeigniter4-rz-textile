@@ -2,6 +2,7 @@
 
 namespace Config;
 
+
 // Create a new instance of our RouteCollection class.
 $routes = Services::routes();
 
@@ -32,48 +33,19 @@ $routes->setAutoRoute(false);
 // We get a performance increase by specifying the default
 // route since we don't have to scan directories.
 
+
+
 // AUTH
 $routes->group('', function ($routes) {
     $routes->get('/', 'AuthController::index', ["as" => "login"]);
-    $routes->post('/auth/login', 'AuthController::login', ["as" => "authenticate"]);
     $routes->get('/logout', 'AuthController::logout', ["as" => "logout", "filter" => "auth"]);
+    $routes->post('/auth/login', 'AuthController::login', ["as" => "authenticate"]);
 });
 
 
 
 //DASHBOARD
 $routes->group('', ['filter' => 'auth'], function ($routes) {
-
-    //INVOICE
-    $routes->group('invoice', function ($routes) {
-        $routes->get('/', 'InvoiceController::show', ["as" => "invoice.show"]);
-        $routes->get('edit/(:any)', 'InvoiceController::edit/$1', ["as" => "invoice.refund"]);
-        $routes->get('print/(:any)', 'InvoiceController::printInvoice/$1', ["as" => "invoice.print"]);
-        $routes->get('report', 'InvoiceController::report', ["as" => "invoice.report", 'filter' => 'isOwner']);
-
-        $routes->post('printReport', 'InvoiceController::printReport', ["as" => "invoice.printreport", 'filter' => 'isOwner']);
-        $routes->post('updatePayment', 'InvoiceController::updatePaymentStatus', ["as" => "invoice.updatePayment"]);
-    });
-
-
-    // ROLL TRANSACTION
-    $routes->group('roll-transaction', function ($routes) {
-        $routes->get('/', 'RollTransactionController::show', ["as" => "rolltransaction.show"]);
-        $routes->get('restock', 'RollTransactionController::edit', ["as" => "rolltransaction.edit"]);
-        $routes->post('store', 'RollTransactionController::store', ["as" => "rolltransaction.store"]);
-    });
-
-    // ROLL
-    $routes->group('roll', function ($routes) {
-        $routes->get('barcode/print/(:any)/(:any)/(:any)/(:num)', 'RollController::printBarcode/$1/$2/$3/$4', ["as" => "roll.printbarcode"]);
-        $routes->get('search', 'RollController::search', ["as" => "roll.search"]);
-        $routes->get('/', 'RollController::show', ["as" => "roll.show"]);
-        $routes->post('store', 'RollController::store', ["as" => "roll.store"]);
-        $routes->get('report', 'RollController::report', ["as" => "roll.report"]);
-        $routes->post('update', 'RollController::update', ["as" => "roll.update"]);
-        $routes->post('destroy', 'RollController::destroy', ["as" => "roll.destroy"]);
-    });
-
 
     // DASHBOARD
     $routes->get('dashboard', 'DashboardController::show', ["as" => "dashboard.show"]);
@@ -83,12 +55,11 @@ $routes->group('', ['filter' => 'auth'], function ($routes) {
     $routes->get('/log-activity', 'LogActivityController::show', ["as" => "log.show", 'filter' => 'isOwner']);
 
 
-    // USER MANAGEMENT
-    $routes->group('/user-management', ['filter' => 'isOwner'], function ($routes) {
-        $routes->get('/', 'UserManagementController::show', ["as" => "usermanagement.show"]);
-        $routes->post('store', 'UserManagementController::store', ["as" => "usermanagement.store"]);
-        $routes->post('destroy', 'UserManagementController::destroy', ["as" => "usermanagement.destroy"]);
-        $routes->post('update', 'UserManagementController::update', ["as" => "usermanagement.update"]);
+    // UNIT
+    $routes->group('unit', function ($routes) {
+        $routes->get('/', 'UnitController::show', ["as" => "unit.show"]);
+        $routes->post('store', 'UnitController::store', ["as" => "unit.store"]);
+        $routes->post('update', 'UnitController::update', ["as" => "unit.update"]);
     });
 
 
@@ -101,13 +72,46 @@ $routes->group('', ['filter' => 'auth'], function ($routes) {
     });
 
 
-    // UNIT
-    $routes->group('unit', function ($routes) {
-        $routes->get('/', 'UnitController::show', ["as" => "unit.show"]);
-        $routes->post('store', 'UnitController::store', ["as" => "unit.store"]);
-        $routes->post('update', 'UnitController::update', ["as" => "unit.update"]);
+    // USER MANAGEMENT
+    $routes->group('/user-management', ['filter' => 'isOwner'], function ($routes) {
+        $routes->get('/', 'UserManagementController::show', ["as" => "usermanagement.show"]);
+        $routes->post('store', 'UserManagementController::store', ["as" => "usermanagement.store"]);
+        $routes->post('destroy', 'UserManagementController::destroy', ["as" => "usermanagement.destroy"]);
+        $routes->post('update', 'UserManagementController::update', ["as" => "usermanagement.update"]);
     });
 
+
+    // ROLL TRANSACTION
+    $routes->group('roll-transaction', function ($routes) {
+        $routes->get('/', 'RollTransactionController::show', ["as" => "rolltransaction.show"]);
+        $routes->get('restock', 'RollTransactionController::edit', ["as" => "rolltransaction.edit"]);
+        $routes->post('store', 'RollTransactionController::store', ["as" => "rolltransaction.store"]);
+    });
+
+
+    // ROLL
+    $routes->group('roll', function ($routes) {
+        $routes->get('barcode/print/(:any)/(:any)/(:any)/(:num)', 'RollController::printBarcode/$1/$2/$3/$4', ["as" => "roll.printbarcode"]);
+        $routes->get('search', 'RollController::search', ["as" => "roll.search"]);
+        $routes->get('/', 'RollController::show', ["as" => "roll.show"]);
+        $routes->post('store', 'RollController::store', ["as" => "roll.store"]);
+        $routes->get('report', 'RollController::report', ["as" => "roll.report"]);
+        $routes->post('update', 'RollController::update', ["as" => "roll.update"]);
+        $routes->post('destroy', 'RollController::destroy', ["as" => "roll.destroy"]);
+        $routes->get('downloadBarcode/(:any)/(:any)/(:any)/(:num)', 'RollController::downloadBarcode/$1/$2/$3/$4', ["as" => "roll.downloadBarcode"]);
+    });
+
+
+    // INVOICE
+    $routes->group('invoice', function ($routes) {
+        $routes->get('/', 'InvoiceController::show', ["as" => "invoice.show"]);
+        $routes->get('edit/(:any)', 'InvoiceController::edit/$1', ["as" => "invoice.refund"]);
+        $routes->get('print/(:any)', 'InvoiceController::printInvoice/$1', ["as" => "invoice.print"]);
+        $routes->get('report', 'InvoiceController::report', ["as" => "invoice.report", 'filter' => 'isOwner']);
+
+        $routes->post('printReport', 'InvoiceController::printReport', ["as" => "invoice.printreport", 'filter' => 'isOwner']);
+        $routes->post('updatePayment', 'InvoiceController::updatePaymentStatus', ["as" => "invoice.updatePayment"]);
+    });
 
     // SHOPPING
     $routes->get('/shopping', 'ShoppingController::show', ["as" => "shopping.show"]);
@@ -119,17 +123,11 @@ $routes->get('error_401', function () {
 
 // REST API
 $routes->group('api', function ($routes) {
-    // $routes->post('user-management/store', 'RESTAPI\UserManagementAPI::store');
-    // $routes->post('user-management/destroy', 'RESTAPI\UserManagementAPI::destroy');
-
-
     $routes->post('shopping/store', 'RESTAPI\ShoppingApi::store');
     $routes->post('refund/update', 'RESTAPI\RefundApi::update');
 
-
     $routes->get('rolls', 'RESTAPI\RollAPI::index');
     $routes->get('rolls/(:any)', 'RESTAPI\RollAPI::show/$1');
-
 
     $routes->get('invoice', 'RESTAPI\InvoiceAPI::getAllInvoice');
     $routes->post('invoice/report', 'RESTAPI\InvoiceAPI::report');

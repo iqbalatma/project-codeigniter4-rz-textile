@@ -12,6 +12,14 @@
         <h1 class="mt-4 mb-4"><?= $title ?></h1>
         <?= $this->include('layouts/alert-section') ?>
 
+        <nav style="--bs-breadcrumb-divider: '>';" aria-label="breadcrumb" class="mt-4 mb-4">
+            <ol class="breadcrumb">
+                <li class="breadcrumb-item "><a href="#">Home</a></li>
+                <li class="breadcrumb-item "><a href="#">Data Barang</a></li>
+                <li class="breadcrumb-item active" aria-current="page">Restok Roll</li>
+            </ol>
+        </nav>
+
         <div class="row">
             <div class="col-xl-12 col-md-12">
                 <div class="card mb-4">
@@ -75,8 +83,11 @@
         function onChangeSelectize(value, isOnInitialize) {
             const basicPrice = $(`.item-roll-selectized[data-value=${value}]`).data('basic-price');
             const sellingPrice = $(`.item-roll-selectized[data-value=${value}]`).data('selling-price');
+            const unitName = $(`.item-roll-selectized[data-value=${value}]`).data('unit-name');
+            console.log(unitName);
             $("#basic_price").val(intToRupiah(basicPrice));
             $("#selling_price").val(intToRupiah(sellingPrice));
+            $("#unit_name").text(unitName);
             $("#roll_quantity").focus();
         }
         const selectized = $("#roll_id").selectize({

@@ -13,7 +13,7 @@
             <input type="text" class="form-control" id="unit_name" name="unit_name" aria-describedby="unit_name" placeholder="Contoh : Kilogram">
           </div>
           <div class="mb-3">
-            <label for="unit_code" class="form-label">Satuan</label>
+            <label for="unit_code" class="form-label">Kode Satuan</label>
             <input type="text" class="form-control" id="unit_code" name="unit_code" aria-describedby="unit_code" placeholder="Contoh : kg">
           </div>
         </div>

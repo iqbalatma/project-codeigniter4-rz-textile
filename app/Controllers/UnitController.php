@@ -3,6 +3,7 @@
 namespace App\Controllers;
 
 use App\Models\Users;
+use App\Services\UnitService;
 use Exception;
 
 class UnitController extends BaseController
@@ -16,10 +17,7 @@ class UnitController extends BaseController
 
     public function show()
     {
-        return view('unit/index', [
-            "title" => "Data Satuan",
-            "units" => $this->unitModel->where("is_deleted", 0)->findAll(),
-        ]);
+        return view('unit/index', UnitService::getShowData());
     }
 
     public function store()
@@ -46,40 +44,17 @@ class UnitController extends BaseController
             return redirect()->route("unit.show")->with("validationError", $validation->listErrors());
         }
 
-        try {
-            $unit_name = $this->request->getPost("unit_name");
-            $unit_code = $this->request->getPost("unit_code");
-            $data = [
-                "unit_name" => $unit_name,
-                "unit_code" => $unit_code
-            ];
-            $this->unitModel->insert($data);
-            $dataLog = [
-                "log_name" => "Aktifitas Tambah Satuan BERHASIL",
-                "log_description" => "Tambah data satuan $unit_name BERHASIL",
-                "log_tr_collor" => "success",
-                "user_id" => session()->get("id_user")
-            ];
-            $this->logModel->insert($dataLog);
-            return redirect()->route("unit.show")->with("success", "Satuan $unit_name berhasil ditambahkan");
-        } catch (Exception $e) {
-            $dataLog = [
-                "log_name" => "Aktifitas Tambah Satuan GAGAL",
-                "log_description" => "Tambah data satuan $unit_name GAGAL",
-                "log_tr_collor" => "danger",
-                "user_id" => session()->get("id_user")
-            ];
-            $this->logModel->insert($dataLog);
-            return redirect()->route("unit.show")->with("failed", "Satuan $unit_name gagal ditambahkan !");
+        if (UnitService::store($this->request->getPost())) {
+            return redirect()->route("unit.show")->with("success", "Satuan " . $this->request->getPost('unit_name') . " berhasil ditambahkan");
+        } else {
+            return redirect()->route("unit.show")->with("failed", "Satuan " . $this->request->getPost('unit_name') . " gagal ditambahkan !");
         }
     }
 
 
     public function update()
     {
-        $unit_id = $this->request->getPost("unit_id");
-        $unit_code = $this->request->getPost("unit_code");
-        $unitCodeFromDB = $this->unitModel->find($unit_id)["unit_code"];
+
 
         $validationRules = [
             'unit_name' => [
@@ -90,7 +65,7 @@ class UnitController extends BaseController
                 ],
             ],
         ];
-        if ($unit_code !== $unitCodeFromDB) {
+        if (!UnitService::isCodeSame($this->request->getPost())) {
             $validationRules["unit_code"] = [
                 'label'  => 'Kode satuan',
                 'rules'  => 'required|is_unique[units.unit_code]',
@@ -105,30 +80,12 @@ class UnitController extends BaseController
             return redirect()->route("unit.show")->with("validationError", $validation->listErrors());
         }
 
-        try {
-            $unit_name = $this->request->getPost("unit_name");
-            $data = [
-                'unit_name' => $unit_name,
-                'unit_code' => $unit_code,
-            ];
-            $this->unitModel->update($unit_id, $data);
-            $dataLog = [
-                "log_name" => "Aktifitas Update Data Satuan BERHASIL",
-                "log_description" => "Update data satuan menjadi $unit_name BERHASIL",
-                "log_tr_collor" => "success",
-                "user_id" => session()->get("id_user")
-            ];
-            $this->logModel->insert($dataLog);
-            return redirect()->route("unit.show")->with("success", "Satuan berhasil diperbaharui menjadi $unit_name");
-        } catch (Exception $e) {
-            $dataLog = [
-                "log_name" => "Aktifitas Update Data Satuan GAGAL",
-                "log_description" => "Update data satuan $unit_name GAGAL",
-                "log_tr_collor" => "success",
-                "user_id" => session()->get("id_user")
-            ];
-            $this->logModel->insert($dataLog);
-            return redirect()->route("unit.show")->with("failed", "Satuan $unit_name gagal diperbaharui");
+        $unitId = $this->request->getPost("unit_id");
+        $unitName = $this->request->getPost("unit_name");
+        if (UnitService::update($this->request->getPost(), $unitId)) {
+            return redirect()->route("unit.show")->with("success", "Satuan berhasil diperbaharui menjadi $unitName");
+        } else {
+            return redirect()->route("unit.show")->with("failed", "Satuan $unitName gagal diperbaharui");
         }
     }
 }

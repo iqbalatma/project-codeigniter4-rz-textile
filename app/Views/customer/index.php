@@ -8,6 +8,14 @@
 
         <?= $this->include('layouts/alert-section') ?>
 
+        <nav style="--bs-breadcrumb-divider: '>';" aria-label="breadcrumb" class="mt-4 mb-4">
+            <ol class="breadcrumb">
+                <li class="breadcrumb-item "><a href="#">Home</a></li>
+                <li class="breadcrumb-item active" aria-current="page">Data Konsumen</li>
+            </ol>
+        </nav>
+
+
         <button type="button" class="btn btn-primary" data-bs-toggle="modal" data-bs-target="#modal_tambah_konsumen">
             <i class="fa-solid fa-square-plus"></i> <b>Tambah Konsumen</b>
         </button>

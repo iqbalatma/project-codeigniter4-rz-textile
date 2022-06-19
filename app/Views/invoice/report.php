@@ -14,6 +14,12 @@
         <h1 class="mt-4 mb-4"><?= $title ?></h1>
         <?= $this->include('layouts/alert-section') ?>
 
+        <nav style="--bs-breadcrumb-divider: '>';" aria-label="breadcrumb" class="mt-4 mb-4">
+            <ol class="breadcrumb">
+                <li class="breadcrumb-item "><a href="#">Home</a></li>
+                <li class="breadcrumb-item active" aria-current="page">Laporan Penjualan</li>
+            </ol>
+        </nav>
 
         <div class="row mb-4">
             <div class="col-xl-12 col-md-12">

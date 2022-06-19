@@ -5,12 +5,20 @@
 <main>
     <div class="container-fluid px-4">
         <h1 class="mt-4 mb-4"><?= $title ?></h1>
+
+        <nav style="--bs-breadcrumb-divider: '>';" aria-label="breadcrumb" class="mt-4 mb-4">
+            <ol class="breadcrumb">
+                <li class="breadcrumb-item "><a href="#">Home</a></li>
+                <li class="breadcrumb-item active" aria-current="page">Dashboard</li>
+            </ol>
+        </nav>
+
+
         <!-- ROW 1 -->
         <div class="row">
             <div class="col-xl-4 col-md-6">
                 <div class="card bg-primary text-white mb-4">
                     <div class="card-body" id="card-payment">
-
                     </div>
                     <div class="card-footer d-flex align-items-center justify-content-between">
                         <a class="small text-white stretched-link" href="/invoice">View Details</a>
@@ -21,7 +29,6 @@
             <div class="col-xl-4 col-md-6">
                 <div class="card bg-danger text-white mb-4">
                     <div class="card-body" id="card-capital">
-
                     </div>
                     <div class="card-footer d-flex align-items-center justify-content-between">
                         <a class="small text-white stretched-link" href="/invoice">View Details</a>

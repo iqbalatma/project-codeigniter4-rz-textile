@@ -18,7 +18,7 @@
           </div>
           <div class="mb-3">
             <label for="no_hp" class="form-label">Nomor HP</label>
-            <input type="text" class="form-control" id="no_hp" name="no_hp" aria-describedby="emailHelp">
+            <input type="number" class="form-control" id="no_hp" name="no_hp" aria-describedby="emailHelp">
           </div>
           <div class="mb-3">
             <label for="address" class="form-label">Alamat</label>

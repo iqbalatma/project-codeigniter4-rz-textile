@@ -16,11 +16,6 @@ class LogActivity extends Model
 
     protected $allowedFields = ['log_id', 'log_name', 'log_description', 'log_tr_collor', 'log_date', 'user_id'];
 
-    public function __construct()
-    {
-        $this->db = \Config\Database::connect();
-    }
-
 
     public function get100LogActivity()
     {

@@ -5,7 +5,18 @@
 <main>
   <div class="container-fluid px-4">
     <h1 class="mt-4 mb-4"><?= $title ?></h1>
+
     <?= $this->include('layouts/alert-section') ?>
+
+    <nav style="--bs-breadcrumb-divider: '>';" aria-label="breadcrumb" class="mt-4 mb-4">
+      <ol class="breadcrumb">
+        <li class="breadcrumb-item "><a href="#">Home</a></li>
+        <li class="breadcrumb-item active" aria-current="page">Manajemen User</li>
+      </ol>
+    </nav>
+
+
+
 
     <button type="button" class="btn btn-primary" data-bs-toggle="modal" data-bs-target="#modal_add_user">
       <i class="fa-solid fa-square-plus"></i> <b>Tambah User</b>

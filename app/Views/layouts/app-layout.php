@@ -21,7 +21,7 @@
 <body class="sb-nav-fixed">
     <nav class="sb-topnav navbar navbar-expand navbar-dark bg-dark">
         <!-- Navbar Brand-->
-        <a class="navbar-brand ps-3" href="index.html">TX TEXTILE</a>
+        <a class="navbar-brand ps-3" href="index.html">RZ TEXTILE</a>
         <!-- Sidebar Toggle-->
         <button class="btn btn-link btn-sm order-1 order-lg-0 me-4 me-lg-0" id="sidebarToggle" href="#!"><i class="fas fa-bars"></i></button>
         <!-- Navbar Search-->
@@ -32,7 +32,7 @@
                 <div class="sb-sidenav-menu">
                     <div class="nav">
                         <div class="sb-sidenav-menu-heading">Core</div>
-                        <a class="nav-link" href="<?= route_to("dashboard.show") ?>">
+                        <a class="nav-link" href="<?= route_to("dashboard.show") ?>" id="first-menu">
                             <div class="sb-nav-link-icon"><i class="fas fa-tachometer-alt"></i></div>
                             Dashboard
                         </a>
@@ -111,6 +111,13 @@
     <script src="/js/general-helper.js"></script>
     <script src="/js/app.js"></script>
 
+    <script>
+        // $(".nav-link").each(function() {
+        //     if (window.location.pathname == $(this).attr('href')) {
+        //         $(this).addClass('active');
+        //     }
+        // })
+    </script>
     <?= $this->renderSection('script') ?>
 
 

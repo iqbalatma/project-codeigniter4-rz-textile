@@ -13,6 +13,14 @@
         <h1 class="mt-4 mb-4"><?= $title ?></h1>
         <?= $this->include('layouts/alert-section') ?>
 
+        <nav style="--bs-breadcrumb-divider: '>';" aria-label="breadcrumb" class="mt-4 mb-4">
+            <ol class="breadcrumb">
+                <li class="breadcrumb-item "><a href="#">Home</a></li>
+                <li class="breadcrumb-item "><a href="#">Data Barang</a></li>
+                <li class="breadcrumb-item active" aria-current="page">Roll</li>
+            </ol>
+        </nav>
+
 
         <div class="row mb-3">
             <div class="col">
@@ -146,7 +154,7 @@
                     <input type="number" min="1" class="form-control" id="quantity-print-barcode" placeholder="Masukkan jumlah barcode yang akan di print !">
                 </div>
                 <p id="barcode"></p>
-                <a id="download-link" class="btn btn-success" download="" href="">Download</a>
+                <a id="download-link" class="btn btn-success" href="">Download</a>
                 <a id="print-link" href="" class="btn btn-primary" target="_blank" rel="noopener noreferrer" onclick="window.open(this.href).print(); return false">Print Barcode</a>
             </div>
         </div>
@@ -301,7 +309,17 @@
             let newUrl = split.slice(0, split.length - 1).join("/") + "/";
             newUrl = newUrl + quantity;
             $("#print-link").attr("href", newUrl);
+
+
+            const split2 = $("#download-link").attr("href").split("/");
+            let newUrl2 = split2.slice(0, split2.length - 1).join("/") + "/";
+            newUrl2 = newUrl2 + quantity;
+            $("#download-link").attr("href", newUrl2);
         });
+
+        $("#print-link").on("click", function() {
+            $('#openBarcode').modal('hide');
+        })
 
         $("#table-roll").on("click", ".openModalBarcode", function() {
             const rollCode = $(this).data("roll-code").trim();
@@ -311,8 +329,11 @@
 
             $("#image-barcode").attr("src", "/" + dataBarcode);
             $("#openBarcodeLabel").text(rollCode);
-            $("#download-link").attr("href", "/" + dataBarcode);
+            $("#download-link").attr("href", `/roll/downloadBarcode/${barcodeName}/${rollCode}/${rollName}/1`);
             $("#print-link").attr("href", `roll/barcode/print/${barcodeName}/${rollCode}/${rollName}/1`);
+        });
+        $('#openBarcode').on('hidden.bs.modal', function() {
+            $("#quantity-print-barcode").val("");
         });
 
         $("#table-roll").on("click", ".btn-edit", function() {

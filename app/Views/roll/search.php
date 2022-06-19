@@ -10,6 +10,15 @@
 <main>
     <div class="container-fluid px-4">
         <h1 class="mt-4"><?= $title ?></h1>
+
+        <nav style="--bs-breadcrumb-divider: '>';" aria-label="breadcrumb" class="mt-4 mb-4">
+            <ol class="breadcrumb">
+                <li class="breadcrumb-item "><a href="#">Home</a></li>
+                <li class="breadcrumb-item "><a href="#">Data Barang</a></li>
+                <li class="breadcrumb-item active" aria-current="page">Search</li>
+            </ol>
+        </nav>
+
         <div class="row mb-4">
             <div class="col-xl-12 col-md-12">
                 <div class="card" id="card-search">

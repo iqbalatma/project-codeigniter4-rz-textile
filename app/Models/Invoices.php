@@ -25,20 +25,30 @@ class Invoices extends Model
     }
 
 
+    public function getLastInvoiceCode()
+    {
+        $builder = $this->db->table($this->table);
+        return $builder->select("invoice_code")
+            ->where(['is_deleted' => 0, 'MONTH(date_invoice)' => getMonthNow(), 'YEAR(date_invoice)' =>  getYearNow()])
+            ->orderBy("invoice_id", "DESC")
+            ->limit(1)
+            ->get()
+            ->getRowObject();
+    }
+
     public function getSumTransactionByCustomerId()
     {
         $query = db_connect()->query("SELECT customer_id, SUM(total_payment) as total_payment FROM invoices GROUP BY invoices.customer_id;");
         return $query->getResultArray();
     }
 
-
     /**
-     * !USED IN DASHBOARD CONTROLLER
+     * DashboardController::show
      */
     public function getInvoicesToday()
     {
         $builder = $this->db->table($this->table);
-        $builder->select('invoices.*, customers.customer_name, users.fullname');
+        $builder->select('invoices.invoice_code,invoices.total_payment, invoices.total_profit,invoices.date_invoice,customers.customer_name, users.fullname');
         $builder->where('invoices.is_deleted', 0);
         $builder->where('DATE(invoices.date_invoice)', getDateNow());
         $builder->orderBy("invoice_code", "DESC");
@@ -55,8 +65,7 @@ class Invoices extends Model
             $month = getMonthNow();
             $year = getYearNow();
         }
-        $db      = \Config\Database::connect();
-        $builder = $db->table($this->table);
+        $builder = $this->db->table($this->table);
         $builder->select('invoices.*, customers.customer_name, users.fullname');
         $builder->where('MONTH(invoices.date_invoice)', $month);
         $builder->where('YEAR(invoices.date_invoice)', $year);

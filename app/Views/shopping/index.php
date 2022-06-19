@@ -9,7 +9,12 @@
     <div class="container-fluid px-4">
         <h1 class="mt-4 mb-4"><?= $title ?></h1>
         <?= $this->include('layouts/alert-section') ?>
-
+        <nav style="--bs-breadcrumb-divider: '>';" aria-label="breadcrumb" class="mt-4 mb-4">
+            <ol class="breadcrumb">
+                <li class="breadcrumb-item "><a href="#">Home</a></li>
+                <li class="breadcrumb-item active" aria-current="page">Penjualan</li>
+            </ol>
+        </nav>
 
         <div class="row">
             <div class="col-xl-8 col-md-8">
@@ -479,6 +484,8 @@
                     cancelButtonText: 'Keluar !',
                     reverseButtons: true
                 }).then((result) => {
+                    alert.waitingAlert();
+
                     if (result.isConfirmed) {
                         $.ajax({
                             url: "/api/shopping/store",
@@ -502,28 +509,40 @@
                                     window.location = "/shopping";
                                 })
 
-                                $("#invoice-code").text(resultInvoice.invoice[0].invoice_code);
-                                $("#customer-name").text(resultInvoice.invoice[0].customer_name);
-                                $("#admin-name").text(resultInvoice.invoice[0].fullname);
-                                $("#total-capital").text(intToRupiah(resultInvoice.invoice[0].total_capital));
-                                $("#total-payment-invoice").text(intToRupiah(resultInvoice.invoice[0].total_payment));
-                                $("#total-profit").text(intToRupiah(resultInvoice.invoice[0].total_profit));
-                                $("#transaction-date").text(intToRupiah(resultInvoice.invoice[0].date_invoice));
-                                $("#modal-print-preview-pdf").attr("href", "/invoice/print/" + resultInvoice.invoice[0].invoice_id)
-                                $("#modal-print-pdf").attr("href", "/invoice/print/" + resultInvoice.invoice[0].invoice_id)
+                                const {
+                                    invoice_code,
+                                    customer_name,
+                                    fullname,
+                                    total_capital,
+                                    total_payment,
+                                    total_profit,
+                                    date_invoice,
+                                    invoice_id
+                                } = resultInvoice.invoice[0];
+
+
+                                $("#invoice-code").text(invoice_code);
+                                $("#customer-name").text(customer_name);
+                                $("#admin-name").text(fullname);
+                                $("#total-capital").text(intToRupiah(total_capital));
+                                $("#total-payment-invoice").text(intToRupiah(total_payment));
+                                $("#total-profit").text(intToRupiah(total_profit));
+                                $("#transaction-date").text(intToRupiah(date_invoice));
+                                $("#modal-print-preview-pdf").attr("href", `/invoice-doc/invoiceid-${invoice_id}.pdf`)
+                                $("#modal-print-pdf").attr("href", `/invoice-doc/invoiceid-${invoice_id}.pdf`)
 
                                 $("#table-roll-modal table").remove();
                                 let content = ` <table class="table">
-                                                <thead>
-                                                    <tr>
-                                                        <th scope="col">No</th>
-                                                        <th scope="col">Nama Roll</th>
-                                                        <th scope="col">Jumlah Roll</th>
-                                                        <th scope="col">Kuantitas Per Roll</th>
-                                                        <th scope="col">Total Kuantitas</th>
-                                                        <th scope="col">Sub Total (Pembayaran)</th>
-                                                    </tr>
-                                                </thead>
+                                                    <thead>
+                                                        <tr>
+                                                            <th scope="col">No</th>
+                                                            <th scope="col">Nama Roll</th>
+                                                            <th scope="col">Jumlah Roll</th>
+                                                            <th scope="col">Kuantitas Per Roll</th>
+                                                            <th scope="col">Total Kuantitas</th>
+                                                            <th scope="col">Sub Total (Pembayaran)</th>
+                                                        </tr>
+                                                    </thead>
                                                 <tbody>`;
 
                                 resultInvoice.transaction_by_invoice_id.forEach((element, index) => {

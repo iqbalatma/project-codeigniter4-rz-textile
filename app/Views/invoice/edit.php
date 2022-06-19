@@ -10,6 +10,14 @@
 <main>
     <div class="container-fluid px-4">
         <h1 class="mt-4"><?= $title ?></h1>
+
+        <nav style="--bs-breadcrumb-divider: '>';" aria-label="breadcrumb" class="mt-4 mb-4">
+            <ol class="breadcrumb">
+                <li class="breadcrumb-item "><a href="#">Home</a></li>
+                <li class="breadcrumb-item " aria-current="page">Refund</li>
+                <li class="breadcrumb-item active" aria-current="page"><?= $dataInvoice["invoice_code"] ?></li>
+            </ol>
+        </nav>
         <div class="row">
             <div class="col-xl-8 mt-4">
                 <div class="card">

@@ -8,6 +8,13 @@
         <h1 class="mt-4"><?= $title ?></h1>
         <?= $this->include('layouts/alert-section') ?>
 
+        <nav style="--bs-breadcrumb-divider: '>';" aria-label="breadcrumb" class="mt-4 mb-4">
+            <ol class="breadcrumb">
+                <li class="breadcrumb-item "><a href="#">Home</a></li>
+                <li class="breadcrumb-item active" aria-current="page">Invoice</li>
+            </ol>
+        </nav>
+
         <!-- ROW FILTER -->
         <div class="row mt-4">
             <div class="col-xl-12 col-md-12">
@@ -237,7 +244,7 @@
             </div>
             <div class="modal-footer">
                 <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
-                <a href="/invoice/print/" type="button" class="btn btn-success" id="modal-print-preview-pdf">Preview PDF</a>
+                <a href="/invoice-doc/invoiceid-40.pdf" type="button" class="btn btn-success" id="modal-print-preview-pdf">Preview PDF</a>
                 <a href="/invoice/print/" type="button" class="btn btn-primary" id="modal-print-pdf" onclick="window.open(this.href).print(); return false">Print PDF</a>
             </div>
         </div>
@@ -315,8 +322,8 @@
             $("#customer-name").text(customerName);
             $("#invoice-code").text(invoiceCode);
             $("#transaction-date").text(transactionDate);
-            $("#modal-print-preview-pdf").attr("href", "/invoice/print/" + invoiceId)
-            $("#modal-print-pdf").attr("href", "/invoice/print/" + invoiceId)
+            $("#modal-print-preview-pdf").attr("href", `/invoice-doc/invoiceid-${invoiceId}.pdf`)
+            $("#modal-print-pdf").attr("href", `/invoice-doc/invoiceid-${invoiceId}.pdf`)
 
 
             $.ajax({
