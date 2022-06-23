@@ -10,7 +10,7 @@ class AuthController extends BaseController
     public function index()
     {
         if (session()->get("isLoggedIn")) {
-            return redirect()->to("/dashboard");
+            return redirect()->route("dashboard.show");
         }
         return view('auth/index', ["title" => "Login"]);
     }
@@ -18,17 +18,16 @@ class AuthController extends BaseController
     public function login()
     {
         if (AuthService::authenticated($this->request->getPost())) {
-            return redirect()->to("/dashboard");
+            return redirect()->route("dashboard.show");
         } else {
-            return redirect()->to("/");
+            return redirect()->route("login");
         }
     }
 
     public function logout()
     {
-        $username = session()->get("username");
-        LogService::setLogSuccess("LOGOUT",  "$username BERHASIL logout");
+        LogService::setLogSuccess("LOGOUT",  session()->get("username") . " BERHASIL logout");
         session()->destroy();
-        return redirect()->to("/");
+        return redirect()->route("login");
     }
 }
