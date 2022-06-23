@@ -5,22 +5,15 @@ namespace App\Controllers;
 use App\Models\Customers;
 use App\Models\Invoices;
 use App\Services\CustomerService;
-use Exception;
+
 
 class CustomerController extends BaseController
 {
 
     public function show()
     {
-        $customerModel = new Customers();
-        $invoiceModel = new Invoices();
-        return view('customer/index', [
-            "title" => "Data Konsumen",
-            "dataCustomers" => $customerModel->where("is_deleted", 0)->findAll(),
-            "dataTransactions" => $invoiceModel->getSumTransactionByCustomerId()
-        ]);
+        return view('customer/index', CustomerService::getData());
     }
-
 
 
     public function store()
@@ -112,7 +105,6 @@ class CustomerController extends BaseController
 
                 ],
             ],
-
         ])) {
             $validation = \Config\Services::validation();
             return redirect()->route("customer.show")->with("validationError", $validation->listErrors());

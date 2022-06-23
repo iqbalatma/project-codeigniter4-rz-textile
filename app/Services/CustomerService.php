@@ -3,25 +3,36 @@
 namespace App\Services;
 
 use App\Models\Customers;
+use App\Models\Invoices;
 use App\Models\LogActivity;
 use Exception;
 
 class CustomerService
 {
-  public static function store($data)
+
+  public static function getData(): array
+  {
+    return  [
+      "title" => "Data Konsumen",
+      "dataCustomers" => (new Customers())->where("is_deleted", 0)->findAll(),
+      "dataTransactions" => (new Invoices())->getSumTransactionByCustomer()
+    ];
+  }
+
+
+  public static function store(array $data): bool
   {
     try {
-      $customerModel = new Customers();
       $customer_name = $data["customer_name"];
-      $data = [
+
+      (new Customers())->insert([
         "customer_NIK" => $data["customer_NIK"],
         "customer_name" => $customer_name,
         "address" => $data["address"],
         "no_hp" => $data["no_hp"],
-      ];
-      $customerModel->insert($data);
-      LogService::setLogSuccess("STORE",   "Customer $customer_name  BERHASIL ditambahkan");
+      ]);
 
+      LogService::setLogSuccess("STORE",   "Customer $customer_name  BERHASIL ditambahkan");
       return true;
     } catch (Exception $e) {
       LogService::setLogFailed("STORE", "Customer $customer_name GAGAL ditambahkan. Error : $e");
@@ -29,15 +40,14 @@ class CustomerService
     }
   }
 
-  public static function update($data)
+
+  public static function update(array $data): bool
   {
     try {
-      $customerModel = new Customers();
-
       $customer_name = $data["customer_name"];
       $customer_id = $data['customer_id'];
 
-      $customerModel->update($customer_id,  [
+      (new Customers())->update($customer_id,  [
         "customer_NIK" => $data["customer_NIK"],
         "customer_name" => $customer_name,
         "address" => $data["address"],
@@ -52,13 +62,13 @@ class CustomerService
     }
   }
 
-  public static function destroy($data)
+  public static function destroy(array $data): bool
   {
     try {
-      $customerModel = new Customers();
       $customer_id = $data["customer_id"];
       $customer_name = $data["customer_name"];
-      $customerModel->update($customer_id, ["is_deleted" => 1]);
+
+      (new Customers())->update($customer_id, ["is_deleted" => 1]);
       LogService::setLogSuccess("DELETE", "Konsumen  $customer_name  BERHASIL dihapus");
       return true;
     } catch (Exception $e) {

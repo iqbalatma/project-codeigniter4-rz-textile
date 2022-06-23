@@ -20,9 +20,29 @@ class Invoices extends Model
     {
         parent::__construct();
         $this->db = \Config\Database::connect();
+
         $this->rollTransactionModel = new \App\Models\RollTransaction();
         $this->rollModel = new \App\Models\Rolls();
     }
+
+
+    /**
+     * * Mengambil data total transaksi di invoice berdasarkan customer
+     * * CustomerService::getData()
+     */
+    public function getSumTransactionByCustomer()
+    {
+        return  $this->builder($this->table)
+            ->select('customer_id')
+            ->selectSum('total_payment', 'total_payment')
+            ->groupBy('customer_id')
+            ->get()->getResultArray();
+    }
+
+
+
+
+
 
 
     public function getLastInvoiceCode()
@@ -36,11 +56,7 @@ class Invoices extends Model
             ->getRowObject();
     }
 
-    public function getSumTransactionByCustomerId()
-    {
-        $query = db_connect()->query("SELECT customer_id, SUM(total_payment) as total_payment FROM invoices GROUP BY invoices.customer_id;");
-        return $query->getResultArray();
-    }
+
 
     /**
      * DashboardController::show
