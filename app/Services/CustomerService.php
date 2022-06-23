@@ -10,7 +10,7 @@ use Exception;
 class CustomerService
 {
 
-  public static function getData(): array
+  public static function getDataIndex(): array
   {
     return  [
       "title" => "Data Konsumen",

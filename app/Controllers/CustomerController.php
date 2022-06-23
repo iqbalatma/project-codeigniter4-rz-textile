@@ -2,8 +2,6 @@
 
 namespace App\Controllers;
 
-use App\Models\Customers;
-use App\Models\Invoices;
 use App\Services\CustomerService;
 
 
@@ -12,7 +10,7 @@ class CustomerController extends BaseController
 
     public function show()
     {
-        return view('customer/index', CustomerService::getData());
+        return view('customer/index', CustomerService::getDataIndex());
     }
 
 

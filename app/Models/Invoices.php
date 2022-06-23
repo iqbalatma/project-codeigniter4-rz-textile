@@ -28,7 +28,7 @@ class Invoices extends Model
 
     /**
      * * Mengambil data total transaksi di invoice berdasarkan customer
-     * * CustomerService::getData()
+     * * CustomerService::getDataIndex()
      */
     public function getSumTransactionByCustomer()
     {
@@ -37,6 +37,23 @@ class Invoices extends Model
             ->selectSum('total_payment', 'total_payment')
             ->groupBy('customer_id')
             ->get()->getResultArray();
+    }
+
+
+    /**
+     * * Mengambil semua data invoice hari ini
+     * * DashboardService::getDataIndex()
+     */
+    public function getInvoicesToday()
+    {
+        return $this->builder($this->table)
+            ->select('invoices.invoice_code,invoices.total_payment, invoices.total_profit,invoices.date_invoice,customers.customer_name, users.fullname')
+            ->where(['invoices.is_deleted' => 0, 'DATE(invoices.date_invoice)' => getDateNow()])
+            ->join('users', 'users.user_id = invoices.user_id')
+            ->join('customers', 'customers.customer_id = invoices.customer_id', "left")
+            ->orderBy('invoice_code', 'DESC')
+            ->get()
+            ->getResultArray();
     }
 
 
@@ -58,21 +75,6 @@ class Invoices extends Model
 
 
 
-    /**
-     * DashboardController::show
-     */
-    public function getInvoicesToday()
-    {
-        $builder = $this->db->table($this->table);
-        $builder->select('invoices.invoice_code,invoices.total_payment, invoices.total_profit,invoices.date_invoice,customers.customer_name, users.fullname');
-        $builder->where('invoices.is_deleted', 0);
-        $builder->where('DATE(invoices.date_invoice)', getDateNow());
-        $builder->orderBy("invoice_code", "DESC");
-        $builder->join('users', 'users.user_id = invoices.user_id');
-        $builder->join('customers', 'customers.customer_id = invoices.customer_id', "left");
-        $query = $builder->get();
-        return $query->getResultArray();
-    }
 
 
     public function getInvoices($id = null, $month = null, $year = null, $limit = null)
