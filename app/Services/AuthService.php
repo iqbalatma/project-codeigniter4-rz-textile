@@ -24,7 +24,7 @@ class AuthService
           "role" => $user["role"],
           "isLoggedIn" => true,
         ];
-        LogService::setLog("Aktifitas Login Berhasil", $user["username"] . " BERHASIL melakukan login", "success");
+        LogService::setLogSuccess("LOGIN", $user["username"] . " BERHASIL melakukan login");
         session()->set($dataSession);
         return true;
       } else {
@@ -35,7 +35,7 @@ class AuthService
     }
 
     if ($loginFailed) {
-      LogService::setLog("Aktifitas Login Gagal", "Terdapat upaya login dengan username " . $username, "danger");
+      LogService::setLogFailed("LOGIN", "Terdapat upaya login dengan username " . $username);
       session()->setFlashdata("msg", '<div class="alert alert-danger" role="alert">Username atau password salah ! Coba Lagi !</div>');
       return false;
     }

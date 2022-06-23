@@ -27,7 +27,7 @@ class AuthController extends BaseController
     public function logout()
     {
         $username = session()->get("username");
-        LogService::setLog("Aktifitas Logout",  "$username BERHASIL logout", "success");
+        LogService::setLogSuccess("LOGOUT",  "$username BERHASIL logout");
         session()->destroy();
         return redirect()->to("/");
     }

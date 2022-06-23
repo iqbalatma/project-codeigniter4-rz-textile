@@ -13,10 +13,10 @@ class InvoiceService
     $invoiceModel = new Invoices();
     try {
       $invoiceModel->update($data, ["is_paid" => 1]);
-      LogService::setLog("Aktifitas update status pembayaran", "Aktifitas update status pembayaran berhasil.", "success");
+      LogService::setLogSuccess("UPDATE", "Aktifitas update status pembayaran berhasil.");
       return true;
     } catch (Exception $e) {
-      LogService::setLog("Aktifitas update status pembayaran", "Aktifitas update status pembayaran gagal.", "danger");
+      LogService::setLogFailed("UPDATE", "Aktifitas update status pembayaran gagal.");
       return false;
     }
   }

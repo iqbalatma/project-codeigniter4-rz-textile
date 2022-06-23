@@ -3,7 +3,7 @@
 namespace App\Controllers\RESTAPI;
 
 use App\Controllers\BaseController;
-
+use App\Services\LogService;
 use CodeIgniter\API\ResponseTrait;
 use Exception;
 
@@ -62,12 +62,8 @@ class ShoppingApi extends BaseController
             ];
             session()->setFlashdata("success", "Transaksi Berhasil");
 
-            $dataLog = [
-                "log_name" => "Transaksi penjualan BERHASIL. ",
-                "log_description" => "Transaksi penjualan BERHASIL. Kode invoice " . $newInvoice["invoice_code"],
-                "log_tr_collor" => "success",
-                "user_id" => session()->get("id_user")
-            ];
+
+            LogService::setLogSuccess("STORE", "Transaksi penjualan BERHASIL. Kode invoice " . $newInvoice["invoice_code"]);
         } catch (Exception $e) {
             $response = [
                 "message" => "failed",
@@ -76,15 +72,10 @@ class ShoppingApi extends BaseController
                 "error" => $e,
             ];
             session()->setFlashdata("failed", "Transaksi Gagal ! Error : $e");
-            $dataLog = [
-                "log_name" => "Transaksi penjualan GAGAL",
-                "log_description" => "Transaksi penjualan GAGAL",
-                "log_tr_collor" => "success",
-                "user_id" => session()->get("id_user")
-            ];
+
+            LogService::setLogFailed("STORE", "Transaksi penjualan GAGAL");
         }
 
-        $this->logModel->insert($dataLog);
         return $this->respond($response, 200);
     }
 

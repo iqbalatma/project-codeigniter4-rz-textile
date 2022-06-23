@@ -27,34 +27,33 @@ class UnitService
         "unit_name" => $unit_name,
         "unit_code" => $unit_code
       ]);
-      LogService::setLog("Aktifitas Tambah Satuan", "Tambah data satuan $unit_name BERHASIL", "success");
+      LogService::setLogSuccess("STORE", "Tambah data satuan $unit_name BERHASIL");
 
       return true;
     } catch (Exception $e) {
-      LogService::setLog("Aktifitas Tambah Satuan", "Tambah data satuan $unit_name GAGAL", "danger");
+      LogService::setLogFailed("STORE", "Tambah data satuan $unit_name GAGAL. Error : $e");
       return false;
     }
   }
 
   public static function update(array $data, int $id): bool
   {
-    $unit_code = $data["unit_code"];
-    $unit_name = $data["unit_name"];
-
     try {
       $unitModel = new Units();
+
+      $unit_code = $data["unit_code"];
+      $unit_name = $data["unit_name"];
+
       $unitModel->update($id, [
         'unit_name' => $unit_name,
         'unit_code' => $unit_code,
       ]);
 
-      LogService::setLog("Aktifitas Update Data Satuan", "Update data satuan menjadi $unit_name BERHASIL", "success");
+      LogService::setLogSuccess("UPDATE", "Update data satuan menjadi $unit_name BERHASIL");
       return true;
-      // return redirect()->route("unit.show")->with("success", "Satuan berhasil diperbaharui menjadi $unit_name");
     } catch (Exception $e) {
-      LogService::setLog("Aktifitas Update Data Satuan", "Update data satuan $unit_name GAGAL. Error : $e", "danger");
+      LogService::setLogFailed("UPDATE", "Update data satuan $unit_name GAGAL. Error : $e");
       return false;
-      // return redirect()->route("unit.show")->with("failed", "Satuan $unit_name gagal diperbaharui");
     }
   }
 

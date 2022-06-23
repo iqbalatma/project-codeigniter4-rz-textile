@@ -3,9 +3,8 @@
 namespace App\Controllers\RESTAPI;
 
 use App\Controllers\BaseController;
-
+use App\Services\LogService;
 use CodeIgniter\API\ResponseTrait;
-use Exception;
 
 class RefundApi extends BaseController
 {
@@ -13,7 +12,6 @@ class RefundApi extends BaseController
     public function __construct()
     {
         $this->rollModel = new \App\Models\Rolls();
-        $this->logModel = new \App\Models\LogActivity();
         $this->rollTransactionModel = new \App\Models\RollTransaction();
         $this->invoiceModel = new \App\Models\Invoices();
         $this->customerModel = new \App\Models\Customers();
@@ -78,13 +76,7 @@ class RefundApi extends BaseController
             $this->invoiceModel->where("invoice_id", $invoiceId)->delete();
         }
 
-        $dataLog = [
-            "log_name" => "Aktifitas Refund Barang Berhasil",
-            "log_description" => "Invoice BERHASIL diperbaharui",
-            "log_tr_collor" => "success",
-            "user_id" => session()->get("id_user")
-        ];
-        $this->logModel->insert($dataLog);
+        LogService::setLogSuccess("UPDATE", "Invoice BERHASIL diperbaharui");
         $response = [
             "message" => "success",
             "message_code" => "200",

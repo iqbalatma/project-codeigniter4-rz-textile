@@ -10,14 +10,14 @@ class RollTransactionService
 {
   public static function store($data): bool
   {
-    $rollId = $data["roll_id"];
-    $rollQuantity = $data["roll_quantity"];
-    $allQuantity = $data["all_quantity"];
-    $rollModel = new Rolls();
-    $rollTransactionModel = new RollTransaction();
-
-
     try {
+      $rollModel = new Rolls();
+      $rollTransactionModel = new RollTransaction();
+
+      $rollId = $data["roll_id"];
+      $rollQuantity = $data["roll_quantity"];
+      $allQuantity = $data["all_quantity"];
+
       $rollData = $rollModel->find($rollId);
       $oldRollQuantity = $rollData["roll_quantity"];
       $oldAllQuantity = $rollData["all_quantity"];
@@ -34,10 +34,10 @@ class RollTransactionService
         "is_deleted" => 0,
       ]);
 
-      LogService::setLog("Aktifitas Transaksi Roll", "Transaksi masuk " . $rollCode . " sejumlah " . $rollQuantity . " Roll Berhasil dilakukan", "success");
+      LogService::setLogSuccess("STORE", "Transaksi masuk $rollCode sejumlah $rollQuantity Roll Berhasil dilakukan");
       return true;
     } catch (Exception $e) {
-      LogService::setLog("Aktifitas Transaksi Roll gagal", "Transaksi masuk  $rollCode sejumlah $rollQuantity roll gagal dilakukan. Error : $e", "danger");
+      LogService::setLogFailed("STORE", "Transaksi masuk  $rollCode sejumlah $rollQuantity roll gagal dilakukan. Error : $e");
       return false;
     }
   }

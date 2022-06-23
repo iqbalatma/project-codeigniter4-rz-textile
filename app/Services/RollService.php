@@ -8,18 +8,18 @@ use Exception;
 
 class RollService
 {
-  public function store($data)
+  public function store(array $data): bool
   {
-    $rollName = $data["roll_name"];
-    $rollCode = $data["roll_code"];
-    $rollQuantity = $data["roll_quantity"];
-    $allQuantity =  $data["all_quantity"];
-
-    $generatedBarcode = $this->getGeneratedBarcode();
-    $rollModel = new Rolls();
-    $rollTransactionModel = new RollTransaction();
-
     try {
+      $generatedBarcode = $this->getGeneratedBarcode();
+      $rollModel = new Rolls();
+      $rollTransactionModel = new RollTransaction();
+
+      $rollName = $data["roll_name"];
+      $rollCode = $data["roll_code"];
+      $rollQuantity = $data["roll_quantity"];
+      $allQuantity =  $data["all_quantity"];
+
       $idRoll =   $rollModel->insert([
         "roll_code" => $rollCode,
         "barcode_code" => $generatedBarcode,
@@ -32,7 +32,7 @@ class RollService
         "is_deleted" => 0,
         "barcode_image" => "barcode/" .  $generatedBarcode . ".jpg",
       ]);
-      LogService::setLog("Aktifitas Tambah Roll BERHASIL", "Tambah Roll BERHASIL dilakukan. Kode Roll : $rollCode, Nama Roll :  $rollName", "success");
+      LogService::setLogSuccess("STORE", "Tambah Roll BERHASIL dilakukan. Kode Roll : $rollCode, Nama Roll :  $rollName");
 
       $rollTransactionModel->insert([
         "roll_id" => $idRoll,
@@ -43,29 +43,29 @@ class RollService
         "invoice_id" => null,
         "is_deleted" => 0
       ]);
-      LogService::setLog("Aktifitas Tambah Transaksi Roll BERHASIL", "Transaksi Roll :  $rollCode BERHASIL dilakukan dengan jumlah $rollQuantity", "success");
+      LogService::setLogSuccess("STORE", "Transaksi Roll :  $rollCode BERHASIL dilakukan dengan jumlah $rollQuantity");
       $this->addBarcode($generatedBarcode);
 
       return true;
     } catch (Exception $e) {
-      LogService::setLog("Aktifitas Tambah Roll GAGAL", "Tambah Roll GAGAL dilakukan.", "success");
-      LogService::setLog("Aktifitas Tambah Transaksi Roll GAGAL", "Tambah Transaksi Roll GAGAL dilakukan. Error : $e", "success");
+      LogService::setLogFailed("STORE", "Tambah Roll GAGAL dilakukan. Errpr: $e");
+      LogService::setLogFailed("STORE", "Tambah Transaksi Roll GAGAL dilakukan. Error : $e");
       return false;
     }
   }
 
-  public function update($data)
+  public function update(array $data): bool
   {
-    $rollId = $data["roll_id"];
-    $rollCode = $data["roll_code"];
-    $rollName = $data["roll_name"];
-    $basicPrice = $data["basic_price"];
-    $sellingPrice =  $data["selling_price"];
-    $unitId =  $data["unit_id"];
-
-    $rollModel = new Rolls();
-
     try {
+      $rollModel = new Rolls();
+
+      $rollId = $data["roll_id"];
+      $rollCode = $data["roll_code"];
+      $rollName = $data["roll_name"];
+      $basicPrice = $data["basic_price"];
+      $sellingPrice =  $data["selling_price"];
+      $unitId =  $data["unit_id"];
+
       $rollModel->update($rollId,  [
         "roll_code" => $rollCode,
         "roll_name" => $rollName,
@@ -75,15 +75,15 @@ class RollService
         "is_deleted" => 0,
       ]);
 
-      LogService::setLog("Aktifitas Update Roll", "Update Roll BERHASIL dilakukan. Kode Roll : $rollCode, Nama Roll :  $rollName", "success");
+      LogService::setLogSuccess("UPDATE", "Update Roll BERHASIL dilakukan. Kode Roll : $rollCode, Nama Roll :  $rollName");
       return true;
     } catch (Exception $e) {
-      LogService::setLog("Aktifitas Update Roll", "Update Roll BERHASIL dilakukan. Kode Roll : $rollCode, Nama Roll :  $rollName", "danger");
+      LogService::setLogFailed("UPDATE", "Update Roll GAGAL dilakukan. Kode Roll : $rollCode, Nama Roll :  $rollName. Error: $e");
       return false;
     }
   }
 
-  public function destroy($data)
+  public function destroy(array $data): bool
   {
     $rollTransactionModel = new RollTransaction();
     $rollModel = new Rolls();
@@ -95,10 +95,10 @@ class RollService
     try {
       $rollTransactionModel->where("roll_id", $rollId)->delete();
       $rollModel->delete($rollId);
-      LogService::setLog("Aktifitas Hapus Roll", "Hapus Roll BERHASIL dilakukan. Kode Roll : $rollCode, Nama Roll :  $rollName", "success");
+      LogService::setLogSuccess("DELETE", "Hapus Roll BERHASIL dilakukan. Kode Roll : $rollCode, Nama Roll :  $rollName");
       return true;
     } catch (Exception $e) {
-      LogService::setLog("Aktifitas Hapus Roll", "Hapus Roll GAGAL dilakukan. Kode Roll : $rollCode, Nama Roll :  $rollName. Error : $e", "danger");
+      LogService::setLogFailed("DELETE", "Hapus Roll GAGAL dilakukan. Kode Roll : $rollCode, Nama Roll :  $rollName. Error : $e");
       return false;
     }
   }
@@ -160,7 +160,7 @@ class RollService
     return $generatedBarcode;
   }
 
-  public function addBarcode($generatedBarcode)
+  public function addBarcode($generatedBarcode): void
   {
     $barcode = new \Picqer\Barcode\BarcodeGeneratorJPG();
     file_put_contents(ROOTPATH . "public/barcode/$generatedBarcode.jpg", $barcode->getBarcode($generatedBarcode, $barcode::TYPE_CODE_128, 3, 50));
