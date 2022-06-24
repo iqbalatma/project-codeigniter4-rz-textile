@@ -3,16 +3,35 @@
 namespace App\Services;
 
 use App\Models\Invoices;
+use App\Models\Rolls;
 use App\Models\RollTransaction;
 use Exception;
 
 class InvoiceService
 {
+  public static function getDataIndex(): array
+  {
+    return  [
+      "title" => "Invoice",
+      "invoices" => (new Invoices())->getInvoices(),
+    ];
+  }
+
+  public static function getDataEdit(int $invoiceId): array
+  {
+    return [
+      "title" => "Refund Barang",
+      "dataInvoice" => (new Invoices())->getInvoices($invoiceId)[0],
+      "dataTransactions" => (new RollTransaction())->getRollTransactionByInvoiceId($invoiceId),
+      "dataRolls" => (new Rolls())->getAllDataRollsIsNotEmpty(),
+    ];
+  }
+
+
   public static function updatePayment($data)
   {
-    $invoiceModel = new Invoices();
     try {
-      $invoiceModel->update($data, ["is_paid" => 1]);
+      (new Invoices())->update($data, ["is_paid" => 1]);
       LogService::setLogSuccess("UPDATE", "Aktifitas update status pembayaran berhasil.");
       return true;
     } catch (Exception $e) {
@@ -45,11 +64,9 @@ class InvoiceService
 
   public static function printInvoice($id)
   {
-    $rollTransactionModel = new RollTransaction();
-    $invoiceModel = new Invoices();
     $data = [
-      "dataTransaction" => $rollTransactionModel->getRollTransactionById($id),
-      "dataInvoice" => $invoiceModel->getInvoices($id),
+      "dataTransaction" => (new RollTransaction())->getRollTransactionByInvoiceId($id),
+      "dataInvoice" => (new Invoices())->getInvoices($id),
     ];
 
     $html = view("printpdf/invoice", $data);

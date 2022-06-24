@@ -2,23 +2,16 @@
 
 namespace App\Controllers;
 
-use App\Models\Invoices;
-use App\Models\Rolls;
-use App\Models\RollTransaction;
+
 use App\Services\InvoiceService;
 
 class InvoiceController extends BaseController
 {
-
-
     public function show()
     {
-        $invoiceModel = new Invoices();
-        return view('invoice/index', [
-            "title" => "Invoice",
-            "invoices" => $invoiceModel->getInvoices(),
-        ]);
+        return view('invoice/index', InvoiceService::getDataIndex());
     }
+
 
     public function report()
     {
@@ -30,16 +23,7 @@ class InvoiceController extends BaseController
 
     public function edit($invoiceId)
     {
-        $invoiceModel = new Invoices();
-        $rollTransactionModel = new RollTransaction();
-        $rollModel = new Rolls();
-        $data = [
-            "title" => "Refund Barang",
-            "dataInvoice" => $invoiceModel->getInvoices($invoiceId)[0],
-            "dataTransactions" => $rollTransactionModel->getRollTransactionById($invoiceId),
-            "dataRolls" => $rollModel->getAllDataRollsIsNotEmpty(),
-        ];
-        return view("invoice/edit", $data);
+        return view("invoice/edit", InvoiceService::getDataEdit($invoiceId));
     }
 
     public function updatePaymentStatus()

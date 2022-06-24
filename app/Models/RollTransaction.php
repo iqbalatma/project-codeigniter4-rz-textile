@@ -16,6 +16,47 @@ class RollTransaction extends Model
 
     protected $allowedFields = ['transaction_id', 'roll_id', 'transaction_type', 'transaction_quantity', 'transaction_quantity_total', 'sub_capital', 'sub_total', 'sub_profit',   'transaction_date',  'invoice_id', 'is_deleted'];
 
+    /**
+     * * Mengembalikan data transaksi berdasarkan id invoice
+     * * InvoiceService::getDataEdit()
+     * * InvoiceService::printInvoice()
+     */
+    function getRollTransactionByInvoiceId($id)
+    {
+        return $this->builder($this->table)
+            ->select('roll_transactions.*, customers.customer_name, users.fullname, rolls.roll_code, rolls.roll_quantity, rolls.all_quantity,rolls.roll_name,rolls.unit_quantity,rolls.basic_price,rolls.selling_price, invoices.invoice_code, units.unit_name')
+            ->where([
+                'roll_transactions.is_deleted' => 0,
+                'roll_transactions.invoice_id' => $id
+            ])
+            ->join('rolls', 'rolls.roll_id = roll_transactions.roll_id')
+            ->join('units', 'units.unit_id = rolls.unit_id')
+            ->join('invoices', 'invoices.invoice_id = roll_transactions.invoice_id')
+            ->join('users', 'users.user_id = invoices.user_id')
+            ->join('customers', 'customers.customer_id = invoices.customer_id', "left")
+            ->get()
+            ->getResultArray();
+    }
+
+
+    function getRollTransactionById($id)
+    {
+        $db      = \Config\Database::connect();
+        $builder = $db->table($this->table);
+        $builder->select('roll_transactions.*, customers.customer_name, users.fullname, rolls.roll_code, rolls.roll_quantity, rolls.all_quantity,rolls.roll_name,rolls.unit_quantity,rolls.basic_price,rolls.selling_price, invoices.invoice_code, units.unit_name');
+        $builder->where('roll_transactions.is_deleted', 0);
+        $builder->where('roll_transactions.invoice_id', $id);
+        $builder->join('rolls', 'rolls.roll_id = roll_transactions.roll_id');
+        $builder->join('units', 'units.unit_id = rolls.unit_id');
+        $builder->join('invoices', 'invoices.invoice_id = roll_transactions.invoice_id');
+        $builder->join('users', 'users.user_id = invoices.user_id');
+        $builder->join('customers', 'customers.customer_id = invoices.customer_id', "left");
+        $query = $builder->get();
+        return $query->getResultArray();
+    }
+
+
+
     function getAllRollTransactions($month = null, $year = null, $transactionType = null)
     {
         if ($month == null || $year == null) {
@@ -52,36 +93,22 @@ class RollTransaction extends Model
         $query = $builder->get();
         return $query->getResultArray();
     }
-    function getRollTransactionById($id)
-    {
-        $db      = \Config\Database::connect();
-        $builder = $db->table($this->table);
-        $builder->select('roll_transactions.*, customers.customer_name, users.fullname, rolls.roll_code, rolls.roll_quantity, rolls.all_quantity,rolls.roll_name,rolls.unit_quantity,rolls.basic_price,rolls.selling_price, invoices.invoice_code, units.unit_name');
-        $builder->where('roll_transactions.is_deleted', 0);
-        $builder->where('roll_transactions.invoice_id', $id);
-        $builder->join('rolls', 'rolls.roll_id = roll_transactions.roll_id');
-        $builder->join('units', 'units.unit_id = rolls.unit_id');
-        $builder->join('invoices', 'invoices.invoice_id = roll_transactions.invoice_id');
-        $builder->join('users', 'users.user_id = invoices.user_id');
-        $builder->join('customers', 'customers.customer_id = invoices.customer_id', "left");
-        $query = $builder->get();
-        return $query->getResultArray();
-    }
-    function getRollTransactionByInvoiceId($id)
-    {
-        $db      = \Config\Database::connect();
-        $builder = $db->table($this->table);
-        $builder->select('roll_transactions.*, customers.customer_name, users.fullname, rolls.roll_code, rolls.roll_quantity, rolls.all_quantity,rolls.roll_name,rolls.unit_quantity,rolls.basic_price,rolls.selling_price, invoices.invoice_code, units.unit_name');
-        $builder->where('roll_transactions.is_deleted', 0);
-        $builder->where('roll_transactions.invoice_id', $id);
-        $builder->join('rolls', 'rolls.roll_id = roll_transactions.roll_id');
-        $builder->join('units', 'units.unit_id = rolls.unit_id');
-        $builder->join('invoices', 'invoices.invoice_id = roll_transactions.invoice_id');
-        $builder->join('users', 'users.user_id = invoices.user_id');
-        $builder->join('customers', 'customers.customer_id = invoices.customer_id', "left");
-        $query = $builder->get();
-        return $query->getResultArray();
-    }
+
+    // function getRollTransactionByInvoiceId($id)
+    // {
+    //     $db      = \Config\Database::connect();
+    //     $builder = $db->table($this->table);
+    //     $builder->select('roll_transactions.*, customers.customer_name, users.fullname, rolls.roll_code, rolls.roll_quantity, rolls.all_quantity,rolls.roll_name,rolls.unit_quantity,rolls.basic_price,rolls.selling_price, invoices.invoice_code, units.unit_name');
+    //     $builder->where('roll_transactions.is_deleted', 0);
+    //     $builder->where('roll_transactions.invoice_id', $id);
+    //     $builder->join('rolls', 'rolls.roll_id = roll_transactions.roll_id');
+    //     $builder->join('units', 'units.unit_id = rolls.unit_id');
+    //     $builder->join('invoices', 'invoices.invoice_id = roll_transactions.invoice_id');
+    //     $builder->join('users', 'users.user_id = invoices.user_id');
+    //     $builder->join('customers', 'customers.customer_id = invoices.customer_id', "left");
+    //     $query = $builder->get();
+    //     return $query->getResultArray();
+    // }
 
     public function getSummaryFinance($month = null, $year = null)
     {

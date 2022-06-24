@@ -57,6 +57,43 @@ class Invoices extends Model
     }
 
 
+    /**
+     * * Mengambil data invoice dengan 2 opsi, semuanya atau by id
+     * * InvoiceService::getDataIndex() 
+     * * InvoiceService::getDataEdit() 
+     * * InvoiceService::printInvoice() 
+     */
+    public function getInvoices($id = null, $month = null, $year = null, $limit = null)
+    {
+        if ($month == null || $year == null) {
+            $month = getMonthNow();
+            $year = getYearNow();
+        }
+
+
+        $whereCondition = [
+            'MONTH(invoices.date_invoice)' => $month,
+            'YEAR(invoices.date_invoice)' => $year,
+            'invoices.is_deleted' => 0
+        ];
+
+        if ($id) $whereCondition['invoices.invoice_id'] = $id;
+
+        return   $this->builder($this->table)
+            ->select('invoices.*, customers.customer_name, users.fullname')
+            ->where([
+                'MONTH(invoices.date_invoice)' => $month,
+                'YEAR(invoices.date_invoice)' => $year,
+                'invoices.is_deleted' => 0
+            ])
+            ->limit($limit, 0)
+            ->orderBy("invoice_id", "DESC")
+            ->join('users', 'users.user_id = invoices.user_id')
+            ->join('customers', 'customers.customer_id = invoices.customer_id', "left")
+            ->get()
+            ->getResultArray();
+    }
+
 
 
 
@@ -77,27 +114,7 @@ class Invoices extends Model
 
 
 
-    public function getInvoices($id = null, $month = null, $year = null, $limit = null)
-    {
-        if ($month == null || $year == null) {
-            $month = getMonthNow();
-            $year = getYearNow();
-        }
-        $builder = $this->db->table($this->table);
-        $builder->select('invoices.*, customers.customer_name, users.fullname');
-        $builder->where('MONTH(invoices.date_invoice)', $month);
-        $builder->where('YEAR(invoices.date_invoice)', $year);
-        $builder->where('invoices.is_deleted', 0);
-        if ($id) {
-            $builder->where('invoices.invoice_id', $id);
-        }
-        $builder->limit($limit, 0);
-        $builder->orderBy("invoice_id", "DESC");
-        $builder->join('users', 'users.user_id = invoices.user_id');
-        $builder->join('customers', 'customers.customer_id = invoices.customer_id', "left");
-        $query = $builder->get();
-        return $query->getResultArray();
-    }
+
 
 
     public function getFinanceInvoice($type = "yearly", $month = null, $year = null)
