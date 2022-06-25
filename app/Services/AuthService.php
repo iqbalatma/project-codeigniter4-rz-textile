@@ -11,13 +11,11 @@ class AuthService
   {
 
     try {
-      $userModel = new Users();
-
       $username = $data["username"];
       $password = $data["password"];
       $loginFailed = false;
 
-      $user = $userModel->where(["username" => $username, 'is_deleted' => 0])->first();
+      $user = (new Users())->where(["username" => $username, 'is_deleted' => 0])->first();
 
       if ($user !== null) {
         if ($user["password"] === $password) {

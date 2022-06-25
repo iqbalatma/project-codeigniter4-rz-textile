@@ -40,6 +40,7 @@ class Rolls extends Model
     /**
      * * Mengambil semua data roll yang di join dengan table unit
      * * RollService -> getSearchData()
+     * * RollService -> getAllDataRolls()
      */
     public function getAllDataRolls()
     {
@@ -51,6 +52,10 @@ class Rolls extends Model
             ->getResultArray();
     }
 
+    /**
+     * * Digunakan untuk mengambil data roll berdasarkan ID dengan join terhadap unit
+     * * RollService::getRollById()
+     */
     function getRollById($id)
     {
         $db      = \Config\Database::connect();

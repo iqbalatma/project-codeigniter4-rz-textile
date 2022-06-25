@@ -4,30 +4,25 @@ namespace App\Controllers\RESTAPI;
 
 use App\Controllers\BaseController;
 use App\Models\Users;
-
+use App\Services\RollService;
 use CodeIgniter\RESTful\ResourceController;
 use CodeIgniter\API\ResponseTrait;
 
 class RollAPI extends BaseController
 {
     use ResponseTrait;
+    private RollService $rollService;
     public function __construct()
     {
-        $this->rollModel = new \App\Models\Rolls();
-        $this->rollTransactionModel = new \App\Models\RollTransaction();
-        $this->invoiceModel = new \App\Models\Invoices();
-        $this->db = \Config\Database::connect();
-        $this->generator = new \Picqer\Barcode\BarcodeGeneratorJPG();
+        $this->rollService = new RollService();
     }
 
     public function index()
     {
-        $data = $this->rollModel->getAllDataRolls();
-        return $this->respond($data, 200);
+        return $this->respond($this->rollService->getAllDataRolls(), 200);
     }
     public function show($id)
     {
-        $data = $this->rollModel->getRollById($id);
-        return $this->respond($data, 200);
+        return $this->respond($this->rollService->getRollById($id), 200);
     }
 }

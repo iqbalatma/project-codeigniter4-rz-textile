@@ -3,7 +3,7 @@
 namespace App\Controllers\RESTAPI;
 
 use App\Controllers\BaseController;
-
+use App\Services\RollTransactionService;
 use CodeIgniter\API\ResponseTrait;
 
 class RollTransactionAPI extends BaseController
@@ -18,18 +18,17 @@ class RollTransactionAPI extends BaseController
 
     public function index()
     {
-        $year = $this->request->getGet("year");
-        $month = $this->request->getGet("month");
-        $data = [
-            "rollTransactionsOut" => $this->rollTransactionModel->getAllRollTransactions($month, $year, "out"),
-            "rollTransactions" => $this->rollTransactionModel->getAllRollTransactions($month, $year, "in"),
-        ];
-        return $this->respond($data, 200);
+        return $this->respond(
+            RollTransactionService::getDataTransactionMonthly($this->request->getGet("month"), $this->request->getGet("year")),
+            200
+        );
     }
 
     public function show($id)
     {
-        $data = $this->rollTransactionModel->getRollTransactionById($id);
-        return $this->respond($data, 200);
+        return $this->respond(
+            RollTransactionService::getTrasactionByInvoiceId($id),
+            200
+        );
     }
 }

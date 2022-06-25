@@ -27,6 +27,61 @@ class InvoiceService
     ];
   }
 
+  public static function getInvoices($month, $year): array
+  {
+    return (new Invoices())->getInvoices(null, $month, $year);
+  }
+
+  public  static function getInvoiceYearly(): array
+  {
+    return [
+      "finance" => (new Invoices())->getFinanceInvoice("yearly"),
+    ];
+  }
+
+  public static function getInvoiceMonthly($month, $year): array
+  {
+    if ($month && $year) {
+      $finance = (new Invoices())->getFinanceInvoice("monthly", $month, $year);
+    } else {
+      $finance = (new Invoices())->getFinanceInvoice("monthly");
+    }
+    return [
+      "finance" => $finance
+    ];
+  }
+
+  public static function getLastInvoice()
+  {
+    $lastInvoice = (new Invoices())->getLastInvoice();
+    $invoiceId = $lastInvoice[0]["invoice_id"];
+    $transactionByInvoiceId = (new RollTransaction())->getRollTransactionByInvoiceId($invoiceId);
+    return  [
+      "invoice" => $lastInvoice,
+      "transaction_by_invoice_id" => $transactionByInvoiceId,
+    ];
+  }
+
+  public static function getInvoiceById(int $id): array
+  {
+    $lastInvoice = (new Invoices())->getInvoices($id);
+    $invoiceId = $lastInvoice[0]["invoice_id"];
+    $transactionByInvoiceId = (new RollTransaction())->getRollTransactionByInvoiceId($invoiceId);
+
+    return   [
+      "invoice" => $lastInvoice,
+      "transaction_by_invoice_id" => $transactionByInvoiceId,
+    ];
+  }
+
+  public static function getInvoiceForReport($lowerLimit, $upperLimit): array
+  {
+    return  [
+      "dataInvoices" => (new Invoices())->getInvoicesRangePaid($lowerLimit, $upperLimit),
+      "dataTransactions" => (new RollTransaction())->getTransactionsRange($lowerLimit, $upperLimit)
+    ];
+  }
+
 
   public static function updatePayment($data)
   {

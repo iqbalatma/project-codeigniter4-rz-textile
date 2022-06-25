@@ -139,7 +139,7 @@ $routes->group('api', function ($routes) {
     $routes->get('roll-transactions/(:any)', 'RESTAPI\RollTransactionAPI::show/$1');
     $routes->get('roll-transactions', 'RESTAPI\RollTransactionAPI::index');
 
-    $routes->get('profit/(:alpha)/(:num)', 'RESTAPI\ProfitApi::show/$1/$2');
+    // $routes->get('profit/(:alpha)/(:num)', 'RESTAPI\ProfitApi::show/$1/$2');
 });
 
 

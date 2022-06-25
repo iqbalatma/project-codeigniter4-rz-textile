@@ -62,6 +62,7 @@ class Invoices extends Model
      * * InvoiceService::getDataIndex() 
      * * InvoiceService::getDataEdit() 
      * * InvoiceService::printInvoice() 
+     * * InvoiceService::getInvoiceById()
      */
     public function getInvoices($id = null, $month = null, $year = null, $limit = null)
     {
@@ -117,15 +118,22 @@ class Invoices extends Model
 
 
 
+    /**
+     * * Digunakan untuk mengambil rangkuman data keuangan dari invoice
+     * * InvoiceService::getInvoiceYearly()
+     * * InvoiceService::getInvoiceMonthly()
+     */
     public function getFinanceInvoice($type = "yearly", $month = null, $year = null)
     {
-        $whereClause = "";
+
         if ($year == null) {
             $year = getYearNow();
         }
         if ($month == null) {
             $month = getMonthNow();
         }
+
+        $whereClause = "";
         if ($type == "yearly") {
             $whereClause .= "WHERE YEAR(date_invoice) = $year";
         } elseif ($type == "monthly") {
@@ -136,24 +144,27 @@ class Invoices extends Model
         FROM invoices 
         $whereClause
         GROUP BY YEAR(date_invoice),MONTH(date_invoice) ORDER BY YEAR(date_invoice),MONTH(date_invoice)");
+
         return $query->getResultArray();
     }
 
 
 
-
+    /**
+     * * Untuk ambil last invoice
+     * * InvoiceService::getLastInvoice()
+     */
     public function getLastInvoice()
     {
-        $db      = \Config\Database::connect();
-        $builder = $db->table($this->table);
-        $builder->select('invoices.*, customers.customer_name, users.fullname');
-        $builder->where('invoices.is_deleted', 0);
-        $builder->limit(1);
-        $builder->orderBy("invoices.invoice_id", "desc");
-        $builder->join('users', 'users.user_id = invoices.user_id');
-        $builder->join('customers', 'customers.customer_id = invoices.customer_id', "left");
-        $query = $builder->get();
-        return $query->getResultArray();
+        return $this->builder($this->table)
+            ->select('invoices.*, customers.customer_name, users.fullname')
+            ->where('invoices.is_deleted', 0)
+            ->limit(1)
+            ->orderBy("invoices.invoice_id", "desc")
+            ->join('users', 'users.user_id = invoices.user_id')
+            ->join('customers', 'customers.customer_id = invoices.customer_id', "left")
+            ->get()
+            ->getResultArray();
     }
 
     public function getInvoicesRange($lowerLimit, $upperLimit)
@@ -168,6 +179,12 @@ class Invoices extends Model
         $result = $query->getResultArray();
         return $result;
     }
+
+
+    /**
+     * * Untuk mengambil data invoice yang sudah dibayar, digunakan untuk laporan keuangan
+     * * InvoiceService::getInvoiceForReport()
+     */
     public function getInvoicesRangePaid($lowerLimit, $upperLimit)
     {
         $lowerLimit = explode("/", $lowerLimit);
@@ -175,7 +192,7 @@ class Invoices extends Model
         $newLowerLimit = $lowerLimit[2] . "-" . $lowerLimit[0] . "-" . $lowerLimit[1] . " 00.00.00";
         $newUpperLimit = $upperLimit[2] . "-" . $upperLimit[0] . "-" . $upperLimit[1] . " 00.00.00";
 
-        $db      = \Config\Database::connect();
+        $db      = db_connect();
         $query = $db->query("SELECT * FROM invoices LEFT JOIN customers ON customers.customer_id = invoices.customer_id WHERE invoices.is_paid = 1 AND invoices.date_invoice BETWEEN '$newLowerLimit' AND '$newUpperLimit'");
         $result = $query->getResultArray();
         return $result;

@@ -20,6 +20,8 @@ class RollTransactionService
     return $data;
   }
 
+
+
   public static function getEditData(): array
   {
     return [
@@ -62,5 +64,18 @@ class RollTransactionService
       LogService::setLogFailed("STORE", "Transaksi masuk  $rollCode sejumlah $rollQuantity roll gagal dilakukan. Error : $e");
       return false;
     }
+  }
+
+  public static function getDataTransactionMonthly($month, $year): array
+  {
+    return [
+      "rollTransactionsOut" => (new RollTransaction())->getAllRollTransactions($month, $year, "out"),
+      "rollTransactions" => (new RollTransaction())->getAllRollTransactions($month, $year, "in"),
+    ];
+  }
+
+  public static function getTrasactionByInvoiceId(int $id): array
+  {
+    return (new RollTransaction())->getRollTransactionByInvoiceId($id);
   }
 }

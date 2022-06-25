@@ -18,7 +18,17 @@ class RollService
     ];
   }
 
-  public function getIndexData()
+  public function getAllDataRolls(): array
+  {
+    return (new Rolls())->getAllDataRolls();
+  }
+
+  public function getRollById($id)
+  {
+    return (new Rolls())->getRollById($id);
+  }
+
+  public function getIndexData(): array
   {
     return [
       "title" => "Data Roll Kain",
@@ -155,12 +165,11 @@ class RollService
 
   public function getGeneratedBarcode()
   {
-    $rollModel = new Rolls();
     $isUnique = false;
     $generatedBarcode = null;
     while (!$isUnique) {
       $generatedBarcode = generateRandomString();
-      if (count($rollModel->getRollByBarcode($generatedBarcode)) === 0) {
+      if (count((new Rolls())->getRollByBarcode($generatedBarcode)) === 0) {
         $isUnique = true;
       }
     }
