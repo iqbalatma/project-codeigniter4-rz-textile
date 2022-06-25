@@ -19,22 +19,16 @@ class UserManagementService
       ];
   }
 
-
   public static function store(array $data): bool
   {
     try {
-      $userModel = new Users();
-
       $fullname = $data["fullname"];
-      $username = $data["username"];
-      $password = $data["password"];
-      $role = $data["role"];
 
-      $userModel->insert([
+      (new Users())->insert([
         "fullname" => $fullname,
-        "username" => $username,
-        "password" => $password,
-        "role" => $role
+        "username" => $data["username"],
+        "password" => $data["password"],
+        "role" => $data["role"]
       ]);
 
       LogService::setLogSuccess("STORE", "Tambah data user $fullname BERHASIL");
@@ -48,8 +42,7 @@ class UserManagementService
   public  static function destroy(int $id, string $status): bool
   {
     try {
-      $userModel = new Users();
-      $userModel->update($id, ["is_deleted" => $status]);
+      (new Users())->update($id, ["is_deleted" => $status]);
 
       LogService::setLogSuccess("DELETE", "Hapus data user BERHASIL");
       return true;
@@ -62,7 +55,6 @@ class UserManagementService
   public static function update(int $userId, array $data): bool
   {
     try {
-      $userModel = new Users();
       $username = $data["username"];
       $fullname = $data["fullname"];
       $password = $data["password"];
@@ -72,6 +64,7 @@ class UserManagementService
         "username" => $username,
         "password" => $password,
       ];
+
       if (session()->id_user == $userId) {
         session()->fullname = $fullname;
         session()->username = $username;
@@ -79,7 +72,7 @@ class UserManagementService
         $dataUpdate["role"] = $data["role"];
       }
 
-      $userModel->update($userId, $data);
+      (new Users())->update($userId, $data);
 
       LogService::setLogSuccess("UPDATE", "Update data user $fullname BERHASIL");
 
@@ -92,12 +85,9 @@ class UserManagementService
 
   public static function isUsernameSame(array $data): bool
   {
-    $userModel = new Users();
-    $userId = $data["user_id"];
-    $username = $data["username"];
-    $usernameFromDB = $userModel->find($userId)["username"];
+    $usernameFromDB = (new Users())->find($data["user_id"])["username"];
 
-    if ($username == $usernameFromDB) {
+    if (($data["username"]) == $usernameFromDB) {
       return true;
     } else {
       return false;
