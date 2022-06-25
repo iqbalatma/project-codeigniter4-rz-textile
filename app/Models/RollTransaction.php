@@ -57,6 +57,10 @@ class RollTransaction extends Model
 
 
 
+    /**
+     * * Untuk mengambil data transaksi
+     * * RollTransactionService:getShowData()
+     */
     function getAllRollTransactions($month = null, $year = null, $transactionType = null)
     {
         if ($month == null || $year == null) {
@@ -64,34 +68,38 @@ class RollTransaction extends Model
             $year = getYearNow();
         }
 
-
-        $db      = \Config\Database::connect();
-        $builder = $db->table($this->table);
-        if ($transactionType == "in") {
-            $builder->select('roll_transactions.*,  rolls.roll_code, rolls.roll_name, rolls.basic_price, units.unit_name');
-            $builder->where('roll_transactions.is_deleted', 0);
-            $builder->where('roll_transactions.invoice_id IS NULL', null, FALSE);
-            $builder->where('roll_transactions.transaction_type', 0);
-            $builder->where('MONTH(roll_transactions.transaction_date)', $month);
-            $builder->where('YEAR(roll_transactions.transaction_date)', $year);
-            $builder->orderBy("roll_transactions.transaction_id", "DESC");
-            $builder->join('rolls', 'rolls.roll_id = roll_transactions.roll_id');
-            $builder->join('units', 'units.unit_id = rolls.unit_id');
+        // $this->builder($this->table)
+        $query = $this->builder($this->table);
+        if ($transactionType == 'in') {
+            $query->select('roll_transactions.*,  rolls.roll_code, rolls.roll_name, rolls.basic_price, units.unit_name')
+                ->where([
+                    'roll_transactions.is_deleted' => 0,
+                    'roll_transactions.transaction_type' => 0,
+                    'MONTH(roll_transactions.transaction_date)' => $month,
+                    'YEAR(roll_transactions.transaction_date)' => $year
+                ])
+                ->where('roll_transactions.invoice_id IS NULL', null, FALSE)
+                ->orderBy("roll_transactions.transaction_id", "DESC")
+                ->join('rolls', 'rolls.roll_id = roll_transactions.roll_id')
+                ->join('units', 'units.unit_id = rolls.unit_id');
         } else {
-            $builder->select('roll_transactions.*, customers.customer_name, users.fullname, rolls.roll_code,rolls.roll_name,rolls.roll_name, rolls.basic_price, invoices.invoice_code, units.unit_name');
-            $builder->where('roll_transactions.is_deleted', 0);
-            $builder->where('roll_transactions.transaction_type', 1);
-            $builder->where('MONTH(roll_transactions.transaction_date)', $month);
-            $builder->where('YEAR(roll_transactions.transaction_date)', $year);
-            $builder->orderBy("roll_transactions.transaction_id", "DESC");
-            $builder->join('rolls', 'rolls.roll_id = roll_transactions.roll_id');
-            $builder->join('units', 'units.unit_id = rolls.unit_id');
-            $builder->join('invoices', 'invoices.invoice_id = roll_transactions.invoice_id');
-            $builder->join('users', 'users.user_id = invoices.user_id');
-            $builder->join('customers', 'customers.customer_id = invoices.customer_id', "left");
+            $query->select('roll_transactions.*, customers.customer_name, users.fullname, rolls.roll_code,rolls.roll_name,rolls.roll_name, rolls.basic_price, invoices.invoice_code, units.unit_name')
+                ->where([
+                    'roll_transactions.is_deleted' => 0,
+                    'roll_transactions.transaction_type' => 1,
+                    'MONTH(roll_transactions.transaction_date)' => $month,
+                    'YEAR(roll_transactions.transaction_date)' => $year,
+                ])
+                ->orderBy("roll_transactions.transaction_id", "DESC")
+                ->join('rolls', 'rolls.roll_id = roll_transactions.roll_id')
+                ->join('units', 'units.unit_id = rolls.unit_id')
+                ->join('invoices', 'invoices.invoice_id = roll_transactions.invoice_id')
+                ->join('users', 'users.user_id = invoices.user_id')
+                ->join('customers', 'customers.customer_id = invoices.customer_id', "left");;
         }
-        $query = $builder->get();
-        return $query->getResultArray();
+
+        return  $query->get()
+            ->getResultArray();
     }
 
     // function getRollTransactionByInvoiceId($id)

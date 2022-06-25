@@ -11,7 +11,7 @@ class RollTransactionController extends BaseController
         return view('roll-transaction/index',  RollTransactionService::getShowData());
     }
 
-    public function edit() //restok
+    public function edit()
     {
         return view('roll-transaction/edit', RollTransactionService::getEditData());
     }

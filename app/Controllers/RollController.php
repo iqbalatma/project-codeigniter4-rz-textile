@@ -11,11 +11,6 @@ class RollController extends BaseController
 
     public function __construct()
     {
-        $this->rollModel = new \App\Models\Rolls();
-        $this->unitModel = new \App\Models\Units();
-        $this->rollTransactionModel = new \App\Models\RollTransaction();
-        $this->logModel = new \App\Models\LogActivity();
-        $this->generator = new \Picqer\Barcode\BarcodeGeneratorJPG();
         $this->rollService = new RollService();
     }
 
