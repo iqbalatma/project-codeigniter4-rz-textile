@@ -4,12 +4,15 @@ namespace App\Controllers\RESTAPI;
 
 use App\Controllers\BaseController;
 use App\Services\LogService;
+use App\Services\PDFService;
+use App\Services\ShoopingAPIService;
 use CodeIgniter\API\ResponseTrait;
 use Exception;
 
 class ShoppingApi extends BaseController
 {
     use ResponseTrait;
+    private ShoopingAPIService $shoopingApiService;
 
     private $emailMessage = "<h1>Invoice Pembelian Kain</h1>Kepada Iqbal Berikut Invoice pembelian anda:";
     private $totalCapital = 0;
@@ -17,10 +20,11 @@ class ShoppingApi extends BaseController
 
     public function __construct()
     {
-        $this->rollModel = new \App\Models\Rolls();
-        $this->logModel = new \App\Models\LogActivity();
-        $this->rollTransactionModel = new \App\Models\RollTransaction();
-        $this->invoiceModel = new \App\Models\Invoices();
+        $this->shoopingApiService = new ShoopingAPIService();
+
+        // $this->rollModel = new \App\Models\Rolls();
+        // $this->rollTransactionModel = new \App\Models\RollTransaction();
+        // $this->invoiceModel = new \App\Models\Invoices();
     }
 
 
@@ -30,28 +34,20 @@ class ShoppingApi extends BaseController
         $dataCustomer = $this->request->getPost("dataCustomer");
         $typePayment =    $this->request->getPost("typePayment");
         $isPaid = $this->request->getPost("isPaid");
-        $newInvoice = $this->getNewDataInvoice($dataCustomer, $typePayment, $isPaid);
+
+
+        $newInvoice = $this->shoopingApiService->generateNewInvoice($dataCustomer, $typePayment, $isPaid);
 
 
         try {
-            $insertedInvoiceId = $this->invoiceModel->insert($newInvoice);
-            $this->totalPayment = 0;
-            $this->totalCapital = 0;
-            foreach ($dataTable as $value) {
-                $this->addNewTransaction($value, $insertedInvoiceId);
-            }
-            // UPDATE DATA INVOICE
-            $this->invoiceModel->update(
-                $insertedInvoiceId,
-                [
-                    "total_payment" => $this->totalPayment,
-                    "total_capital" => $this->totalCapital,
-                    "total_profit" => $this->totalPayment - $this->totalCapital
-                ]
-            );
+            $insertedInvoiceId = $this->shoopingApiService->storeNewInvoice($newInvoice);
+
+            $this->shoopingApiService->storeNewTransaction($dataTable, $insertedInvoiceId);
+
+            $this->shoopingApiService->updateInvoice($insertedInvoiceId);
 
             // $attachment = "./invoice-doc/invoiceid-$insertedInvoiceId.pdf";
-            $this->saveInvoiceToPdf($insertedInvoiceId);
+            PDFService::saveInvoiceToPdf($insertedInvoiceId);
             // $this->sendEmail('iqbalatma@gmail.com',  $attachment);
 
 
@@ -80,97 +76,97 @@ class ShoppingApi extends BaseController
     }
 
 
-    private function getNewDataInvoice($dataCustomer, $typePayment, $isPaid)
-    {
-        $invoiceCode =  $this->invoiceModel->getLastInvoiceCode();
-        $invoiceCode ?
-            $counter = explode("/", $invoiceCode->invoice_code)[5] + 1  : $counter = 1;
+    // private function getNewDataInvoice($dataCustomer, $typePayment, $isPaid)
+    // {
+    //     $invoiceCode =  $this->invoiceModel->getLastInvoiceCode();
+    //     $invoiceCode ?
+    //         $counter = explode("/", $invoiceCode->invoice_code)[5] + 1  : $counter = 1;
 
-        $dataInvoice = [
-            "invoice_code" => "INV/" . getDateNowSlash() . "/OUT/$counter",
-            "is_deleted" => 0,
-            "user_id" => intval(session()->get("id_user")),
-            "type_payment" => $typePayment,
-            "is_paid" => $isPaid
-        ];
+    //     $dataInvoice = [
+    //         "invoice_code" => "INV/" . getDateNowSlash() . "/OUT/$counter",
+    //         "is_deleted" => 0,
+    //         "user_id" => intval(session()->get("id_user")),
+    //         "type_payment" => $typePayment,
+    //         "is_paid" => $isPaid
+    //     ];
 
-        if ($dataCustomer["customerId"] > 0) $dataInvoice["customer_id"] =  intval($dataCustomer["customerId"]);
+    //     if ($dataCustomer["customerId"] > 0) $dataInvoice["customer_id"] =  intval($dataCustomer["customerId"]);
 
-        return $dataInvoice;
-    }
-
-
-    private function addNewTransaction($data, $invoiceId)
-    {
-        $rollId = $data["rollId"];
-        $subTotal =  rupiahToInt($data["subTotal"]);
-        $rollQuantity = intval($data["transactionRollQuantity"]);
-        $unitQuantity = intval($data["transactionAllQuantity"]);
-        $totalAllQuantity = $rollQuantity * $unitQuantity;
+    //     return $dataInvoice;
+    // }
 
 
-        // UPDATE ROLL YANG TERJUAL
-        $rollData = $this
-            ->rollModel
-            ->where("roll_id", $rollId)
-            ->first();
-
-        $this->addCapital(intval($rollData["basic_price"])   * $totalAllQuantity);
-        $this->addPayment($subTotal);
-
-        $newRollQuantity    = intval($rollData["roll_quantity"])  - $rollQuantity;
-        $newUnitQuantity    = intval($rollData["all_quantity"])   - ($totalAllQuantity);
-        $subCapital         = intval($rollData["basic_price"])    * $totalAllQuantity;
-        $subProfit           = $subTotal - (intval($rollData["basic_price"]) * $totalAllQuantity);
+    // private function addNewTransaction($data, $invoiceId)
+    // {
+    // $rollId = $data["rollId"];
+    // $subTotal =  rupiahToInt($data["subTotal"]);
+    // $rollQuantity = intval($data["transactionRollQuantity"]);
+    // $unitQuantity = intval($data["transactionAllQuantity"]);
+    // $totalAllQuantity = $rollQuantity * $unitQuantity;
 
 
-        // TAMBAHKAN DATA TRANSAKSI
-        $dataTransaksi = [
-            "roll_id" => $rollId,
-            "transaction_type" => 1, //keluar
-            "transaction_quantity" => $rollQuantity,
-            "transaction_quantity_total" => $unitQuantity * $rollQuantity,
-            "sub_capital" => $subCapital,
-            "sub_total" => $subTotal,
-            "sub_profit" => $subProfit,
-            "invoice_id" => $invoiceId,
-        ];
-        $this->rollTransactionModel->insert($dataTransaksi);
-        $this->rollModel->update($rollId, [
-            "roll_quantity" =>  $newRollQuantity,
-            "all_quantity" => $newUnitQuantity
-        ]);
-    }
+    // // UPDATE ROLL YANG TERJUAL
+    // $rollData = $this
+    //     ->rollModel
+    //     ->where("roll_id", $rollId)
+    //     ->first();
+
+    // $this->addCapital(intval($rollData["basic_price"])   * $totalAllQuantity);
+    // $this->addPayment($subTotal);
+
+    // $newRollQuantity    = intval($rollData["roll_quantity"])  - $rollQuantity;
+    // $newUnitQuantity    = intval($rollData["all_quantity"])   - ($totalAllQuantity);
+    // $subCapital         = intval($rollData["basic_price"])    * $totalAllQuantity;
+    // $subProfit           = $subTotal - (intval($rollData["basic_price"]) * $totalAllQuantity);
 
 
-    private function saveInvoiceToPdf($id)
-    {
-        $data = [
-            "dataTransaction" => $this->rollTransactionModel->getRollTransactionById($id),
-            "dataInvoice" => $this->invoiceModel->getInvoices($id),
-        ];
+    // // TAMBAHKAN DATA TRANSAKSI
+    // $dataTransaksi = [
+    //     "roll_id" => $rollId,
+    //     "transaction_type" => 1, //keluar
+    //     "transaction_quantity" => $rollQuantity,
+    //     "transaction_quantity_total" => $unitQuantity * $rollQuantity,
+    //     "sub_capital" => $subCapital,
+    //     "sub_total" => $subTotal,
+    //     "sub_profit" => $subProfit,
+    //     "invoice_id" => $invoiceId,
+    // ];
+    // $this->rollTransactionModel->insert($dataTransaksi);
+    // $this->rollModel->update($rollId, [
+    //     "roll_quantity" =>  $newRollQuantity,
+    //     "all_quantity" => $newUnitQuantity
+    // ]);
+    // }
 
-        $html = view("printpdf/invoice", $data);
 
-        $mpdf = new \Mpdf\Mpdf([
-            'margin_left' => 10,
-            'margin_right' => 10,
-            'margin_top' => 48,
-            'margin_bottom' => 25,
-            'margin_header' => 10,
-            'margin_footer' => 10,
-            'format' => 'A5-L'
-        ]);
+    // private function saveInvoiceToPdf($id)
+    // {
+    //     $data = [
+    //         "dataTransaction" => $this->rollTransactionModel->getRollTransactionById($id),
+    //         "dataInvoice" => $this->invoiceModel->getInvoices($id),
+    //     ];
 
-        $invoiceCode = $data["dataInvoice"][0]["invoice_code"];
-        $mpdf->SetProtection(array('print'));
-        $mpdf->SetTitle($invoiceCode);
-        $mpdf->SetAuthor("RZ TEXTILE");
-        $mpdf->SetDisplayMode('fullpage');
+    //     $html = view("printpdf/invoice", $data);
 
-        $mpdf->WriteHTML($html);
-        $mpdf->Output("./invoice-doc/invoiceid-$id.pdf", "F");
-    }
+    //     $mpdf = new \Mpdf\Mpdf([
+    //         'margin_left' => 10,
+    //         'margin_right' => 10,
+    //         'margin_top' => 48,
+    //         'margin_bottom' => 25,
+    //         'margin_header' => 10,
+    //         'margin_footer' => 10,
+    //         'format' => 'A5-L'
+    //     ]);
+
+    //     $invoiceCode = $data["dataInvoice"][0]["invoice_code"];
+    //     $mpdf->SetProtection(array('print'));
+    //     $mpdf->SetTitle($invoiceCode);
+    //     $mpdf->SetAuthor("RZ TEXTILE");
+    //     $mpdf->SetDisplayMode('fullpage');
+
+    //     $mpdf->WriteHTML($html);
+    //     $mpdf->Output("./invoice-doc/invoiceid-$id.pdf", "F");
+    // }
 
 
     private function sendEmail($to,  $attachment = null)
@@ -187,14 +183,14 @@ class ShoppingApi extends BaseController
     }
 
 
-    private function addCapital($capital)
-    {
-        $this->totalCapital += $capital;
-    }
+    // private function addCapital($capital)
+    // {
+    //     $this->totalCapital += $capital;
+    // }
 
 
-    private function addPayment($payment)
-    {
-        $this->totalPayment += $payment;
-    }
+    // private function addPayment($payment)
+    // {
+    //     $this->totalPayment += $payment;
+    // }
 }

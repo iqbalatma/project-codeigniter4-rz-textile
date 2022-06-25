@@ -63,6 +63,7 @@ class Invoices extends Model
      * * InvoiceService::getDataEdit() 
      * * InvoiceService::printInvoice() 
      * * InvoiceService::getInvoiceById()
+     * * PDFService::saveToPdf();
      */
     public function getInvoices($id = null, $month = null, $year = null, $limit = null)
     {

@@ -10,7 +10,7 @@ class PDFService
   public static function saveInvoiceToPdf(int $id): void
   {
     $data = [
-      "dataTransaction" => (new RollTransaction())->getRollTransactionById($id),
+      "dataTransaction" => (new RollTransaction())->getRollTransactionByInvoiceId($id),
       "dataInvoice" => (new Invoices())->getInvoices($id),
     ];
 
