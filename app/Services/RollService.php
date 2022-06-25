@@ -4,23 +4,41 @@ namespace App\Services;
 
 use App\Models\Rolls;
 use App\Models\RollTransaction;
+use App\Models\Units;
 use Exception;
 
 class RollService
 {
+
+  public function getSearchData(): array
+  {
+    return [
+      "title" => "Pencarian Item",
+      "dataRolls" => (new Rolls())->getAllDataRolls()
+    ];
+  }
+
+  public function getIndexData()
+  {
+    return [
+      "title" => "Data Roll Kain",
+      "dataRolls" => (new Rolls())->getAllDataRolls(),
+      "dataUnits" => (new Units())->where("is_deleted", 0)->findAll(),
+      "dataFinances" => (new RollTransaction())->getSummaryFinance()
+    ];
+  }
+
   public function store(array $data): bool
   {
     try {
       $generatedBarcode = $this->getGeneratedBarcode();
-      $rollModel = new Rolls();
-      $rollTransactionModel = new RollTransaction();
 
       $rollName = $data["roll_name"];
       $rollCode = $data["roll_code"];
       $rollQuantity = $data["roll_quantity"];
       $allQuantity =  $data["all_quantity"];
 
-      $idRoll =   $rollModel->insert([
+      $idRoll =   (new Rolls())->insert([
         "roll_code" => $rollCode,
         "barcode_code" => $generatedBarcode,
         "roll_name" => $rollName,
@@ -34,7 +52,7 @@ class RollService
       ]);
       LogService::setLogSuccess("STORE", "Tambah Roll BERHASIL dilakukan. Kode Roll : $rollCode, Nama Roll :  $rollName");
 
-      $rollTransactionModel->insert([
+      (new RollTransaction())->insert([
         "roll_id" => $idRoll,
         "transaction_type" => 0,
         "transaction_quantity" => $rollQuantity,
@@ -44,7 +62,7 @@ class RollService
         "is_deleted" => 0
       ]);
       LogService::setLogSuccess("STORE", "Transaksi Roll :  $rollCode BERHASIL dilakukan dengan jumlah $rollQuantity");
-      $this->addBarcode($generatedBarcode);
+      $this->storeBarcode($generatedBarcode);
 
       return true;
     } catch (Exception $e) {
@@ -57,21 +75,16 @@ class RollService
   public function update(array $data): bool
   {
     try {
-      $rollModel = new Rolls();
-
       $rollId = $data["roll_id"];
       $rollCode = $data["roll_code"];
       $rollName = $data["roll_name"];
-      $basicPrice = $data["basic_price"];
-      $sellingPrice =  $data["selling_price"];
-      $unitId =  $data["unit_id"];
 
-      $rollModel->update($rollId,  [
+      (new Rolls())->update($rollId,  [
         "roll_code" => $rollCode,
         "roll_name" => $rollName,
-        "basic_price" => $basicPrice,
-        "selling_price" => $sellingPrice,
-        "unit_id" => $unitId,
+        "basic_price" => $data["basic_price"],
+        "selling_price" => $data["selling_price"],
+        "unit_id" => $data["unit_id"],
         "is_deleted" => 0,
       ]);
 
@@ -85,16 +98,13 @@ class RollService
 
   public function destroy(array $data): bool
   {
-    $rollTransactionModel = new RollTransaction();
-    $rollModel = new Rolls();
-
-    $rollId = $data["roll_id"];
-    $rollCode = $data["roll_code"];
-    $rollName = $data["roll_name"];
-
     try {
-      $rollTransactionModel->where("roll_id", $rollId)->delete();
-      $rollModel->delete($rollId);
+      $rollId = $data["roll_id"];
+      $rollCode = $data["roll_code"];
+      $rollName = $data["roll_name"];
+
+      (new RollTransaction())->where("roll_id", $rollId)->delete();
+      (new Rolls())->delete($rollId);
       LogService::setLogSuccess("DELETE", "Hapus Roll BERHASIL dilakukan. Kode Roll : $rollCode, Nama Roll :  $rollName");
       return true;
     } catch (Exception $e) {
@@ -135,11 +145,8 @@ class RollService
 
   public function isCodeSame(array $data): bool
   {
-    $rollModel = new Rolls();
-    $rollId = $data["roll_id"];
-    $rollCode = $data["roll_code"];
-    $rollCodeFromDB = $rollModel->getRollById($rollId)[0]["roll_code"];
-    if ($rollCode == $rollCodeFromDB) {
+    $rollCodeFromDB = (new Rolls())->getRollById($data["roll_id"])[0]["roll_code"];
+    if ($data["roll_code"] == $rollCodeFromDB) {
       return true;
     } else {
       return false;
@@ -160,7 +167,7 @@ class RollService
     return $generatedBarcode;
   }
 
-  public function addBarcode($generatedBarcode): void
+  public function storeBarcode($generatedBarcode): void
   {
     $barcode = new \Picqer\Barcode\BarcodeGeneratorJPG();
     file_put_contents(ROOTPATH . "public/barcode/$generatedBarcode.jpg", $barcode->getBarcode($generatedBarcode, $barcode::TYPE_CODE_128, 3, 50));

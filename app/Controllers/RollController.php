@@ -2,9 +2,6 @@
 
 namespace App\Controllers;
 
-use App\Models\Rolls;
-use App\Models\RollTransaction;
-use App\Models\Units;
 use App\Services\RollService;
 
 class RollController extends BaseController
@@ -24,29 +21,12 @@ class RollController extends BaseController
 
     public function search()
     {
-        $rollModel = new Rolls();
-        return view("roll/search", [
-            "title" => "Pencarian Item",
-            "dataRolls" => $rollModel->getAllDataRolls()
-        ]);
+        return view("roll/search", $this->rollService->getSearchData());
     }
-
 
     public function show()
     {
-        $rollModel = new Rolls();
-        $unitModel = new Units();
-        $rollTransactionModel = new RollTransaction();
-        $dataRolls = $rollModel->getAllDataRolls();
-        $dataUnits = $unitModel->where("is_deleted", 0)->findAll();
-        $data = [
-            "title" => "Data Roll Kain",
-            "dataRolls" => $dataRolls,
-            "dataUnits" => $dataUnits,
-            "dataFinances" => $rollTransactionModel->getSummaryFinance()
-        ];
-
-        return view('roll/index', $data);
+        return view('roll/index', $this->rollService->getIndexData());
     }
 
     public function store()
@@ -180,7 +160,6 @@ class RollController extends BaseController
     public function destroy()
     {
         $rollCode = $this->request->getPost("roll_code");
-
         if ($this->rollService->destroy($this->request->getPost())) {
             return redirect()->route("roll.show")->with("success", "Data roll kain $rollCode berhasil dihapus");
         } else {

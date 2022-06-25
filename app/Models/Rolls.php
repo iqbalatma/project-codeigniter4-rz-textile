@@ -36,15 +36,18 @@ class Rolls extends Model
     }
 
 
+    /**
+     * * Mengambil semua data roll yang di join dengan table unit
+     * * RollService -> getSearchData()
+     */
     public function getAllDataRolls()
     {
-        $db      = \Config\Database::connect();
-        $builder = $db->table($this->table);
-        $builder->select('*');
-        $builder->join('units', 'rolls.unit_id= units.unit_id');
-        $builder->where("rolls.is_deleted", 0);
-        $query = $builder->get();
-        return $query->getResultArray();
+        return $this->builder($this->table)
+            ->select('*')
+            ->join('units', 'rolls.unit_id= units.unit_id')
+            ->where("rolls.is_deleted", 0)
+            ->get()
+            ->getResultArray();
     }
 
     function getRollById($id)
