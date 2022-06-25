@@ -2,19 +2,10 @@
 
 namespace App\Controllers;
 
-use App\Models\Users;
 use App\Services\UnitService;
-use Exception;
 
 class UnitController extends BaseController
 {
-
-    public function __construct()
-    {
-        $this->unitModel = new \App\Models\Units();
-        $this->logModel = new \App\Models\LogActivity();
-    }
-
     public function show()
     {
         return view('unit/index', UnitService::getShowData());
@@ -54,8 +45,6 @@ class UnitController extends BaseController
 
     public function update()
     {
-
-
         $validationRules = [
             'unit_name' => [
                 'label'  => 'Nama satuan',

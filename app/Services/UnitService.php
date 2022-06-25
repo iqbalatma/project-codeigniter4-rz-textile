@@ -9,21 +9,19 @@ class UnitService
 {
   public static function getShowData(): array
   {
-    $unitModel = new Units();
     return  [
       "title" => "Data Unit",
-      "units" => $unitModel->where("is_deleted", 0)->findAll(),
+      "units" => (new Units())->where("is_deleted", 0)->findAll(),
     ];
   }
 
   public static function store(array $data): bool
   {
     try {
-      $unitModel = new Units();
       $unit_name = $data["unit_name"];
       $unit_code = $data["unit_code"];
 
-      $unitModel->insert([
+      (new Units())->insert([
         "unit_name" => $unit_name,
         "unit_code" => $unit_code
       ]);
@@ -39,12 +37,10 @@ class UnitService
   public static function update(array $data, int $id): bool
   {
     try {
-      $unitModel = new Units();
-
       $unit_code = $data["unit_code"];
       $unit_name = $data["unit_name"];
 
-      $unitModel->update($id, [
+      (new Units())->update($id, [
         'unit_name' => $unit_name,
         'unit_code' => $unit_code,
       ]);
@@ -59,11 +55,10 @@ class UnitService
 
   public static function isCodeSame(array $data): bool
   {
-    $unitModel = new Units();
     $unit_code = $data["unit_code"];
     $unit_id = $data["unit_id"];
 
-    $unitCodeFromDB = $unitModel->find($unit_id)["unit_code"];
+    $unitCodeFromDB = (new Units())->find($unit_id)["unit_code"];
 
     if ($unitCodeFromDB == $unit_code) {
       return true;
